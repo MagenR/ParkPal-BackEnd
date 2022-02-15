@@ -11,14 +11,10 @@ namespace ParkPal_BackEnd.Controllers
 {
     public class UsersController : ApiController
     {
-        // GET api/<controller>
-        public IEnumerable<string> Get()
-        {
-            return new string[] { "value1", "value2" };
-        }
-
-        // GET api/<controller>/5
-        [Route("api/login")]
+        //--------------------------------------------------------------------------------------------------
+        // GET
+        //--------------------------------------------------------------------------------------------------
+        [Route("api/users/login")]
         public IHttpActionResult Get(string login, string password)
         {
             try
@@ -34,12 +30,37 @@ namespace ParkPal_BackEnd.Controllers
             }
         }
 
-        [Route("api/ValidateUsername")]
+        private IHttpActionResult Get(string login, DataServices.LoginType type)
+        {
+            try
+            {
+                AppUser u = AppUser.Get(login, type);
+                if (u == null)
+                    return Ok(u);
+                return Content(HttpStatusCode.Conflict, "Error. Username already exists.");
+            }
+            catch (Exception ex)
+            {
+                return Content(HttpStatusCode.Conflict, "Error. Could not process request.\n" + ex.Message);
+            }
+        }
 
-        [Route("api/ValidateEmail")]
+        [Route("api/users/validateusername")]
+        public IHttpActionResult ValdiateUsername(string username)
+        {
+            return Get(username, DataServices.LoginType.Username);
+        }
 
-        // POST api/<controller>
-        [Route("api/signup")]
+        [Route("api/users/validateemail")]
+        public IHttpActionResult ValidateEmail(string email)
+        {
+            return Get(email, DataServices.LoginType.Email);
+        }
+
+        //--------------------------------------------------------------------------------------------------
+        // POST
+        //--------------------------------------------------------------------------------------------------
+        [Route("api/users/signup")]
         public IHttpActionResult Post([FromBody] AppUser u)
         {
             try
@@ -54,8 +75,10 @@ namespace ParkPal_BackEnd.Controllers
             }
         }
 
-        // PUT api/<controller>/5
-        [Route("api/update")]
+        //--------------------------------------------------------------------------------------------------
+        // PUT
+        //--------------------------------------------------------------------------------------------------
+        [Route("api/users/update")]
         public IHttpActionResult Put([FromBody] AppUser u)
         {
             try
@@ -70,9 +93,12 @@ namespace ParkPal_BackEnd.Controllers
             }
         }
 
-        // DELETE api/<controller>/5
+        //--------------------------------------------------------------------------------------------------
+        // DELETE
+        //--------------------------------------------------------------------------------------------------
         public void Delete(int id)
         {
         }
+
     }
 }
