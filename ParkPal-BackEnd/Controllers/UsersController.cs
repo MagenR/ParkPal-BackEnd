@@ -34,6 +34,10 @@ namespace ParkPal_BackEnd.Controllers
             }
         }
 
+        [Route("api/ValidateUsername")]
+
+        [Route("api/ValidateEmail")]
+
         // POST api/<controller>
         [Route("api/signup")]
         public IHttpActionResult Post([FromBody] AppUser u)
