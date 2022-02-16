@@ -53,7 +53,7 @@ namespace ParkPal_BackEnd.Models.DAL
             if (o is AppUser)
             {
                 AppUser u = (AppUser)o;
-                commandText += "ParkPal_Users values(@email, @username, @password, @first_name, @last_name) ";
+                commandText += "ParkPal_Users values(@username, @email, @password, @first_name, @last_name) ";
                 cmd.CommandText = commandText;
 
                 cmd.Parameters.AddWithValue("@email", u.Email);
@@ -111,14 +111,13 @@ namespace ParkPal_BackEnd.Models.DAL
         //--------------------------------------------------------------------------------------------------
         private static void BuildUpdateCommand(SqlCommand cmd, object o)
         {
-
             string commandText = "UPDATE ";
             if (o is AppUser)
             {
                 AppUser u = (AppUser)o;
                 commandText += "ParkPal_Users " +
-                             "SET username=@new_usr, email=@new_email, password=@new_pwd, first_name=@new_fname, last_name=@new_lname " +
-                             "WHERE id=@id";
+                               "SET username=@new_usr, email=@new_email, password=@new_pwd, first_name=@new_fname, last_name=@new_lname " +
+                               "WHERE id=@id";
                 cmd.CommandText = commandText;
 
                 cmd.Parameters.AddWithValue("@new_email", u.Email);
@@ -234,14 +233,19 @@ namespace ParkPal_BackEnd.Models.DAL
         //--------------------------------------------------------------------------------------------------
         public static List<ParkingLot> GetParkingLots(DateTime startTime, DateTime endTime)
         {
-            string selectSTR = "SELECT * " +
-                               "FROM ParkPal_Parking_Lots as pl " +
-                               "WHERE EXISTS (SELECT pa.parking_lot_id " +
-                                            "FROM ParkPal_Parking_Arrangements as pa " +
-                                            "WHERE pl.id = pa.parking_lot_id " +
-                                                "and pa.start_time > " + endTime + " or pa.end_time > " + startTime +
-                                            " GROUP BY pa.parking_lot_id " +
-                                            "HAVING COUNT(pa.id) < pl.num_of_spaces);";
+            //string selectSTR = "SELECT * " +
+            //                   "FROM ParkPal_Parking_Lots as pl " +
+            //                   "WHERE EXISTS (SELECT pa.parking_lot_id " +
+            //                                "FROM ParkPal_Parking_Arrangements as pa " +
+            //                                "WHERE pl.id = pa.parking_lot_id " +
+            //                                    "and pa.start_time > " + endTime + " or pa.end_time > " + startTime +
+            //                                " GROUP BY pa.parking_lot_id " +
+            //                                "HAVING COUNT(pa.id) < pl.num_of_spaces);";
+
+            string selectSTR = "SELECT pl.id, pl.name, pl.address, pl.hourly_tariff, pl.num_of_spaces, pl.latitude, pl.longitude " +
+                               "FROM ParkPal_Parking_Lots as pl LEFT JOIN ParkPal_Parking_Arrangements as pa on pl.id = pa.parking_lot_id " +
+                               "GROUP BY pl.id, pl.name, pl.address, pl.hourly_tariff, pl.num_of_spaces, pl.latitude, pl.longitude " + 
+                               "HAVING COUNT(pa.id) < pl.num_of_spaces; ";
 
             SqlConnection con = Connect("DBConnectionString");
             SqlCommand cmd = new SqlCommand(selectSTR, con);
@@ -252,7 +256,7 @@ namespace ParkPal_BackEnd.Models.DAL
                     return null;
                 List<ParkingLot> parkingLots = new List<ParkingLot>();
                 while (dr.Read())
-                    parkingLots.Add(new ParkingLot((int)dr["parking_lot_id"], (string)dr["name"], (string)dr["address"], (int)dr["hourly_tariff"], (int)dr["num_of_spaces"], (double)dr["longitude"], (double)dr["latitude"]));
+                    parkingLots.Add(new ParkingLot((int)dr["id"], (string)dr["name"], (string)dr["address"], (int)dr["hourly_tariff"], (int)dr["num_of_spaces"], (double)dr["latitude"], (double)dr["longitude"]));
                 return parkingLots;
             }
             catch (Exception ex)

@@ -8,6 +8,7 @@ using ParkPal_BackEnd.Models;
 
 namespace ParkPal_BackEnd.Controllers
 {
+    [RoutePrefix("api/parkinglots")]
     public class ParkingLotsController : ApiController
     {
         // GET api/<controller>
@@ -16,13 +17,13 @@ namespace ParkPal_BackEnd.Controllers
             return new string[] { "value1", "value2" };
         }
 
-        // GET api/<controller>/5
-        [Route("api/SearchMath")]
-        public IHttpActionResult Get(int longitude, int latitude, DateTime startTime, DateTime endTime)
+        [HttpGet]
+        [Route("/SearchMath")]       
+        public IHttpActionResult Get(int latitude, int longitude, DateTime startTime, DateTime endTime)
         {
             try
             {
-                List<ParkingLot> pls = ParkingLot.Get(longitude, latitude, startTime, endTime);
+                List<ParkingLot> pls = ParkingLot.Get(latitude, longitude, startTime, endTime);
                 if (pls == null)
                     return Content(HttpStatusCode.Conflict, "No mathcing parking lots found.");
                 return Ok(pls);

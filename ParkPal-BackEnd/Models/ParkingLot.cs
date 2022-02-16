@@ -68,12 +68,14 @@ namespace ParkPal_BackEnd.Models
 
         }
 
+        public ParkingLot() { }
+
         //--------------------------------------------------------------------------------------------------
         // Methods 
         //--------------------------------------------------------------------------------------------------
         
         // Checks wether given parking lot is in desired distance from a point on map.
-        private static bool isInRadius(ParkingLot pl, double longitude, double latitude)
+        private static bool isInRadius(ParkingLot pl, double latitude, double longitude)
         {
             double φ1 = latitude * Math.PI / 180; // φ, λ in radians
             double φ2 = pl.Latitude * Math.PI / 180;
@@ -91,14 +93,14 @@ namespace ParkPal_BackEnd.Models
         }
 
         // Returns the list of parking lots corresponding to requested loaction.
-        public static List<ParkingLot> Get(double longitude, double latitude, DateTime startTime, DateTime endTime)
+        public static List<ParkingLot> Get(double latitude, double longitude, DateTime startTime, DateTime endTime)
         {
-            List<ParkingLot> VacantSlot = DataServices.GetParkingLots( startTime, endTime);
+            List<ParkingLot> VacantSlot = DataServices.GetParkingLots(startTime, endTime);
             List<ParkingLot> VacantAndInRadius = new List<ParkingLot>();
 
             foreach(ParkingLot pl in VacantSlot)
             {
-                if(isInRadius(pl, longitude, latitude))
+                if(isInRadius(pl, latitude, longitude))
                     VacantAndInRadius.Add(pl);
             }
             return VacantAndInRadius;

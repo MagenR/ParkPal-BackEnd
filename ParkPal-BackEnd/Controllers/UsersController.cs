@@ -9,12 +9,14 @@ using ParkPal_BackEnd.Models.DAL;
 
 namespace ParkPal_BackEnd.Controllers
 {
+    [RoutePrefix("api/users")]
     public class UsersController : ApiController
     {
         //--------------------------------------------------------------------------------------------------
         // GET
         //--------------------------------------------------------------------------------------------------
-        [Route("api/users/login")]
+        [HttpGet]
+        [Route("login")]
         public IHttpActionResult Get(string login, string password)
         {
             try
@@ -36,8 +38,8 @@ namespace ParkPal_BackEnd.Controllers
             {
                 AppUser u = AppUser.Get(login, type);
                 if (u == null)
-                    return Ok(u);
-                return Content(HttpStatusCode.Conflict, "Error. Username already exists.");
+                    return Ok();
+                return Content(HttpStatusCode.Conflict, "Error. " + type.ToString() + " already exists.");
             }
             catch (Exception ex)
             {
@@ -45,13 +47,15 @@ namespace ParkPal_BackEnd.Controllers
             }
         }
 
-        [Route("api/users/validateusername")]
+        [HttpGet]
+        [Route("{username}/ValdiateUsername")]
         public IHttpActionResult ValdiateUsername(string username)
         {
             return Get(username, DataServices.LoginType.Username);
         }
 
-        [Route("api/users/validateemail")]
+        [HttpGet]
+        [Route("{email}/ValidateEmail")]
         public IHttpActionResult ValidateEmail(string email)
         {
             return Get(email, DataServices.LoginType.Email);
@@ -60,7 +64,8 @@ namespace ParkPal_BackEnd.Controllers
         //--------------------------------------------------------------------------------------------------
         // POST
         //--------------------------------------------------------------------------------------------------
-        [Route("api/users/signup")]
+        [HttpPost]
+        [Route("signup")]
         public IHttpActionResult Post([FromBody] AppUser u)
         {
             try
@@ -78,7 +83,8 @@ namespace ParkPal_BackEnd.Controllers
         //--------------------------------------------------------------------------------------------------
         // PUT
         //--------------------------------------------------------------------------------------------------
-        [Route("api/users/update")]
+        [HttpPut]
+        [Route("update")]
         public IHttpActionResult Put([FromBody] AppUser u)
         {
             try
