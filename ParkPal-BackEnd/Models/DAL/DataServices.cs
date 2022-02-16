@@ -97,10 +97,10 @@ namespace ParkPal_BackEnd.Models.DAL
                 cmd.Parameters.Add("@parking_lot_id", SqlDbType.Int);
                 cmd.Parameters["@parking_lot_id"].Value = pa.ReservedAt.Id;
 
-                cmd.Parameters.Add("@start_time", SqlDbType.SmallDateTime);
+                cmd.Parameters.Add("@start_time", SqlDbType.Date);
                 cmd.Parameters["@start_time"].Value = pa.StartTime;
 
-                cmd.Parameters.Add("@end_time", SqlDbType.SmallDateTime);
+                cmd.Parameters.Add("@end_time", SqlDbType.Date);
                 cmd.Parameters["@end_time"].Value = pa.EndTime;
             }
 
@@ -117,7 +117,7 @@ namespace ParkPal_BackEnd.Models.DAL
                 AppUser u = (AppUser)o;
                 commandText += "ParkPal_Users " +
                                "SET username=@new_usr, email=@new_email, password=@new_pwd, first_name=@new_fname, last_name=@new_lname " +
-                               "WHERE id=@id";
+                               "WHERE id= '" + u.Id + "'" ;
                 cmd.CommandText = commandText;
 
                 cmd.Parameters.AddWithValue("@new_email", u.Email);
@@ -233,22 +233,21 @@ namespace ParkPal_BackEnd.Models.DAL
         //--------------------------------------------------------------------------------------------------
         public static List<ParkingLot> GetParkingLots(DateTime startTime, DateTime endTime)
         {
-            //string selectSTR = "SELECT * " +
-            //                   "FROM ParkPal_Parking_Lots as pl " +
-            //                   "WHERE EXISTS (SELECT pa.parking_lot_id " +
-            //                                "FROM ParkPal_Parking_Arrangements as pa " +
-            //                                "WHERE pl.id = pa.parking_lot_id " +
-            //                                    "and pa.start_time > " + endTime + " or pa.end_time > " + startTime +
-            //                                " GROUP BY pa.parking_lot_id " +
-            //                                "HAVING COUNT(pa.id) < pl.num_of_spaces);";
-
-            string selectSTR = "SELECT pl.id, pl.name, pl.address, pl.hourly_tariff, pl.num_of_spaces, pl.latitude, pl.longitude " +
-                               "FROM ParkPal_Parking_Lots as pl LEFT JOIN ParkPal_Parking_Arrangements as pa on pl.id = pa.parking_lot_id " +
-                               "GROUP BY pl.id, pl.name, pl.address, pl.hourly_tariff, pl.num_of_spaces, pl.latitude, pl.longitude " + 
-                               "HAVING COUNT(pa.id) < pl.num_of_spaces; ";
+            string selectSTR = "SELECT pl.id, pl.name, pl.address, pl.hourly_tariff, pl.num_of_spaces, pl.latitude, pl.longitude, COUNT(pa.id) " +
+                               "FROM ParkPal_Parking_Lots as pl LEFT JOIN ParkPal_Parking_Arrangements as pa on pl.id = pa.parking_lot_id" +
+                               "WHERE DATEDIFF(day, pa.end_time, '@startTime') >= 0 or DATEDIFF(day, '@end_time', pa.start_time) >= 0 or pa.id is NULL " +
+                               "GROUP BY pl.id, pl.name, pl.address, pl.hourly_tariff, pl.num_of_spaces, pl.latitude, pl.longitude " +
+                               "HAVING COUNT(pa.id) < pl.num_of_spaces;";
 
             SqlConnection con = Connect("DBConnectionString");
             SqlCommand cmd = new SqlCommand(selectSTR, con);
+
+            cmd.Parameters.Add("@start_time", SqlDbType.Date);
+            cmd.Parameters["@start_time"].Value = startTime;
+
+            cmd.Parameters.Add("@end_time", SqlDbType.Date);
+            cmd.Parameters["@end_time"].Value = endTime;
+
             try
             {
                 SqlDataReader dr = cmd.ExecuteReader(CommandBehavior.CloseConnection);

@@ -16,7 +16,7 @@ namespace ParkPal_BackEnd.Controllers
         // GET
         //--------------------------------------------------------------------------------------------------
         [HttpGet]
-        [Route("login")]
+        [Route("loginUser")]
         public IHttpActionResult Get(string login, string password)
         {
             try
