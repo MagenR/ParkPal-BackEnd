@@ -202,7 +202,7 @@ namespace ParkPal_BackEnd.Models.DAL
                 case LoginType.Email: selectSTR += " u.email = '" + login + "'"; break;
                 case LoginType.Username: selectSTR += " u.username = '" + login + "'"; break;
                 case LoginType.Password:
-                default: selectSTR += " u.email = '" + login + "' or u.username = '" + login + "' and u.password = '" + password + "'"; break;
+                default: selectSTR += " (u.email = '" + login + "' or u.username = '" + login + "') and u.password = '" + password + "'"; break;
             }
             SqlConnection con = Connect("DBConnectionString"); // create a connection to the database using the connection String defined in the web config file
             SqlCommand cmd = new SqlCommand(selectSTR, con);

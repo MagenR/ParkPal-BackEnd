@@ -18,7 +18,7 @@ namespace ParkPal_BackEnd.Controllers
         }
 
         [HttpGet]
-        [Route("/SearchMath")]       
+        [Route("SearchMath")]       
         public IHttpActionResult Get(int latitude, int longitude, DateTime startTime, DateTime endTime)
         {
             try
