@@ -65,7 +65,6 @@ namespace ParkPal_BackEnd.Models
             Id = id;
             Name = name;
             Address = address;
-
         }
 
         public ParkingLot() { }
@@ -98,12 +97,20 @@ namespace ParkPal_BackEnd.Models
             List<ParkingLot> VacantSlot = DataServices.GetParkingLots(startTime, endTime);
             List<ParkingLot> VacantAndInRadius = new List<ParkingLot>();
 
-            foreach(ParkingLot pl in VacantSlot)
+            foreach (ParkingLot pl in VacantSlot)
             {
-                if(isInRadius(pl, latitude, longitude))
+                if (isInRadius(pl, latitude, longitude))
                     VacantAndInRadius.Add(pl);
             }
             return VacantAndInRadius;
+            
+        }
+
+        public static List<ParkingLot> Get(DateTime startTime, DateTime endTime)
+        {
+            List<ParkingLot> VacantSlot = DataServices.GetParkingLots(startTime, endTime);
+            return VacantSlot;
+
         }
 
     }

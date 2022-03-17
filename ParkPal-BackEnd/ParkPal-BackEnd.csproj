@@ -169,11 +169,16 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Models\Auction.cs" />
+    <Compile Include="Models\AuctionCampaign.cs" />
+    <Compile Include="Models\Bidder.cs" />
     <Compile Include="Models\DAL\DataServices.cs" />
     <Compile Include="Models\DataBaseObject.cs" />
+    <Compile Include="Models\Match.cs" />
     <Compile Include="Models\ParkingArrangement.cs" />
     <Compile Include="Models\ParkingLot.cs" />
     <Compile Include="Models\AppUser.cs" />
+    <Compile Include="Models\Seller.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

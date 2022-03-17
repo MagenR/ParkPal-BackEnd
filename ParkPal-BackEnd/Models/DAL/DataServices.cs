@@ -234,7 +234,7 @@ namespace ParkPal_BackEnd.Models.DAL
         public static List<ParkingLot> GetParkingLots(DateTime startTime, DateTime endTime)
         {
             string selectSTR = "SELECT pl.id, pl.name, pl.address, pl.hourly_tariff, pl.num_of_spaces, pl.latitude, pl.longitude, COUNT(pa.id) " +
-                               "FROM ParkPal_Parking_Lots as pl LEFT JOIN ParkPal_Parking_Arrangements as pa on pl.id = pa.parking_lot_id" +
+                               "FROM ParkPal_Parking_Lots as pl LEFT JOIN ParkPal_Parking_Arrangements as pa on pl.id = pa.parking_lot_id " +
                                "WHERE DATEDIFF(day, pa.end_time, '@startTime') >= 0 or DATEDIFF(day, '@end_time', pa.start_time) >= 0 or pa.id is NULL " +
                                "GROUP BY pl.id, pl.name, pl.address, pl.hourly_tariff, pl.num_of_spaces, pl.latitude, pl.longitude " +
                                "HAVING COUNT(pa.id) < pl.num_of_spaces;";

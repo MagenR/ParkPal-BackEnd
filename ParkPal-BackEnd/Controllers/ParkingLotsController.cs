@@ -11,10 +11,21 @@ namespace ParkPal_BackEnd.Controllers
     [RoutePrefix("api/parkinglots")]
     public class ParkingLotsController : ApiController
     {
-        // GET api/<controller>
-        public IEnumerable<string> Get()
+        [HttpGet]
+        [Route("SearchVacant")]
+        public IHttpActionResult Get(DateTime startTime, DateTime endTime)
         {
-            return new string[] { "value1", "value2" };
+            try
+            {
+                List<ParkingLot> pls = ParkingLot.Get(startTime, endTime);
+                if (pls == null)
+                    return Content(HttpStatusCode.Conflict, "No mathcing parking lots found.");
+                return Ok(pls);
+            }
+            catch (Exception ex)
+            {
+                return Content(HttpStatusCode.Conflict, "Error. Could not process request.\n" + ex.Message);
+            }
         }
 
         [HttpGet]
@@ -25,7 +36,7 @@ namespace ParkPal_BackEnd.Controllers
             {
                 List<ParkingLot> pls = ParkingLot.Get(latitude, longitude, startTime, endTime);
                 if (pls == null)
-                    return Content(HttpStatusCode.Conflict, "No mathcing parking lots found.");
+                    return Content(HttpStatusCode.Conflict, "No matching parking lots found.");
                 return Ok(pls);
             }
             catch (Exception ex)

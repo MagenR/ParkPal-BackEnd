@@ -38,7 +38,7 @@ namespace ParkPal_BackEnd.Controllers
             {
                 AppUser u = AppUser.Get(login, type);
                 if (u == null)
-                    return Ok();
+                    return Ok(type.ToString() + " can be used!");
                 return Content(HttpStatusCode.Conflict, "Error. " + type.ToString() + " already exists.");
             }
             catch (Exception ex)
