@@ -46,16 +46,12 @@ namespace ParkPal_BackEnd.Models
             autoBid(Auctions, Bidders);
         }
 
-
         // Initialize auctions.
         public List<Auction> initAuctions(List<Seller> sellers)
         {
             List<Auction> auctions = new List<Auction>();
             foreach (Seller seller in sellers)
-            {
-                auctions.Add(new Auction(seller.MinSellingPrice, seller));
-            }
-                
+                auctions.Add(new Auction(seller.MinSellingPrice, seller));            
             return auctions;
         }
 
@@ -65,32 +61,23 @@ namespace ParkPal_BackEnd.Models
             if(bidder.BidLimit > auction.CurrBid)
             {
                 if(auction.HighestBidder != null)
-                {
                     auction.CurrBid++;
-                }
-                Console.WriteLine(bidder.FirstName + " " + bidder.LastName + " bid on " + auction.Seller.FirstName + " " + auction.Seller.LastName + "'s Auction " + auction.CurrBid + " money.");
+                Console.WriteLine( bidder.UserName + " bid on " + auction.Seller.UserName + "'s Auction " + auction.CurrBid + " money.");
                 auction.HighestBidder = bidder;
-
             }
-
         }
 
-        // run over bidders list and auto increment if possible.
+        // Run over bidders list and auto increment if possible.
         public void autoBid(List<Auction> auctions, List<Bidder> bidders)
         {
             bool noBidMade = false;
             while (!noBidMade)
-            {
                 foreach (Bidder bidder in bidders)
-                {
                     if(outbid(bidder, auctions))
                         placeNewBid(findLowestAuction(auctions), bidder);
-                }
-            }
-
         }
 
-        // Checks if user was outbid in campagin.
+        // Checks if user was outbid in campaign.
         public bool outbid(Bidder bidder, List<Auction> auctions)
         {
             foreach (Auction auction in auctions)
@@ -105,15 +92,20 @@ namespace ParkPal_BackEnd.Models
             Auction lowestAuc = auctions.First();
             int lowestBid = lowestAuc.CurrBid;
             foreach (var auction in Auctions)
-            {
                 if (auction.CurrBid < lowestBid || (auction.CurrBid == lowestBid && auction.HighestBidder == null))
                 {
                     lowestAuc = auction;
                     lowestBid = auction.CurrBid;
                 }
-            }
             return lowestAuc;
         }
 
-    }
-}
+        // Returns this campaign upon controller request.
+        public AuctionCampaign Get()
+        {
+            return this;
+        }
+
+    }  // End of class - AuctionCampaign.
+
+} // End of nameSpace - ParkPal_BackEnd.Models.
