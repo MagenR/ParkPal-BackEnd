@@ -1,35 +1,20 @@
 ﻿
-window.addEventListener('DOMContentLoaded', event => {
-
-    // Toggle the side navigation
-    const sidebarToggle = document.body.querySelector('#sidebarToggle');
-    if (sidebarToggle) {
-        // Uncomment Below to persist sidebar toggle between refreshes
-        // if (localStorage.getItem('sb|sidebar-toggle') === 'true') {
-        //     document.body.classList.toggle('sb-sidenav-toggled');
-        // }
-        sidebarToggle.addEventListener('click', event => {
-            event.preventDefault();
-            document.body.classList.toggle('sb-sidenav-toggled');
-            localStorage.setItem('sb|sidebar-toggle', document.body.classList.contains('sb-sidenav-toggled'));
-        });
-    }
-
-});
-
 // ---------------------------------------- Constroller functions--------------------------
 
 $(document).ready(function () {
 
     const queryString = window.location.search;
     const urlParams = new URLSearchParams(queryString);
-    var urlParam = 'auction'; // Set Default param to users.
+    var urlParam = 'addBuyer'; // Set Default param to auction.
     urlParam = urlParams.get('category');
     renderText(urlParam);
+    $('#makeAbidModal').on('click', '#MakeAbidBtn', function () {
+        postAuction();
+    });
 
 });
 
-// ---------------------------------------------- Getters ----------------------------------------------
+// ---------------------------------------------- Get --------------------------------------------------
 
 // Get users list for admin use.
 function getAuction() {
@@ -50,6 +35,31 @@ function getErrorCB(err) {
     else
         swal("Error!", err.responseJSON.Message, "error");
 }
+
+// ---------------------------------------------- Post -------------------------------------------------
+
+
+function postAuction() {
+
+    let newBid = {
+        User_Name: $('#userName').val(),
+        Bid: $('#bid').val(),
+        Max_Bid: $('#maxBid').val(),
+    }
+
+    let api = "../api/Auction";
+    ajaxCall("POST", api, JSON.stringify(newBid), postAuctionSuccessCB, postAuctionErrorCB);
+}
+
+function postAuctionSuccessCB(msg) {
+    getAuction();
+}
+
+function postAuctionErrorCB(err) {
+    console.log(err.status + " " + err.responseJSON.Message);
+    swal("Error!", err.responseJSON.Message, "error");
+}
+
 
 // ---------------------------------------------- List Renders ----------------------------------------------
 
@@ -90,6 +100,10 @@ function renderAuction(auction) {
     }
 }
 
+function showModal() {
+    $('#makeAbidModal').modal('show');
+}
+
 // ---------------------------------------------- Dynamic text input ----------------------------------------------
 
 function renderText(choice) {
@@ -100,10 +114,10 @@ function renderText(choice) {
 
     switch (choice) {
         case 'addBuyer':
-            MainHeading = 'Episodes Data Base';
-            MainText = 'All favourited episodes by series data and their count.';
-            TableName = 'Episodes';
-            getEpisodes();
+            MainHeading = 'Auction Data Base';
+            MainText = 'All the bidding for this parking lot.';
+            TableName = 'Auction';
+            showModal();
             break;
         case 'auction':
         default:
