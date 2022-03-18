@@ -61,12 +61,10 @@ namespace ParkPal_BackEnd.Models
         }
 
         // For Auction demo
-        public AppUser(string firstName, string lastName)
+        public AppUser(string username)
         {
-            FirstName = firstName;
-            LastName = lastName;
+            UserName = username;
         }
-
 
         public AppUser() {}
 

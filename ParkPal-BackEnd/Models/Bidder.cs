@@ -8,19 +8,19 @@ namespace ParkPal_BackEnd.Models
     {
         // Fields
         int bidLimit;
-        List<Auction> biddingAuctions;
-        Auction currentLead;
+        //List<Auction> biddingAuctions;
+        //Auction currentLead;
 
         // Props
         public int BidLimit { get => bidLimit; set => bidLimit = value; }
 
         // Constructors
-        public Bidder(int bidLimit, string firstName, string lastName) : base(firstName, lastName)
+        public Bidder(int bidLimit, string username) : base(username)
         {
             BidLimit = bidLimit;
         }
 
-        // Methods
+        // Methods --------------------------------------------------------------------------------
 
         // Sort the bidders by bid limit desc.
         public int CompareTo(object obj)
@@ -34,5 +34,6 @@ namespace ParkPal_BackEnd.Models
                 throw new ArgumentException("Object is not of type Bidder.");
         }
 
-    }
-}
+    } // End of class - Bidder.
+
+} // End of nameSpace - ParkPal_BackEnd.Models.

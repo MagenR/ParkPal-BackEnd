@@ -8,21 +8,21 @@ namespace ParkPal_BackEnd.Models
     {
         // Fields
         int minSellingPrice;
-        Auction owningAuction;
+        //Auction owningAuction;
 
         // Props
         public int MinSellingPrice { get => minSellingPrice; set => minSellingPrice = value; }
 
         // Constructors
-        public Seller(int minSellingPrice, string firstName, string lastName) : base( firstName,  lastName)
+        public Seller(int minSellingPrice, string username) : base(username)
         {
             MinSellingPrice = minSellingPrice;
         }
 
-        // Methods
+        // Methods --------------------------------------------------------------------------------
 
         // Sort the bidders by bid limit desc.
-        public int CompareTo(object obj) //עבור המיון מהקטן לגדול
+        public int CompareTo(object obj) // Sort Asc.
         {
             if (obj is Seller)
             {
@@ -33,5 +33,6 @@ namespace ParkPal_BackEnd.Models
                 throw new ArgumentException("Object is not of type Seller.");
         }
 
-    }
-}
+    } // End of class - Seller.
+
+} // End of nameSpace - ParkPal_BackEnd.Models.

@@ -8,10 +8,17 @@ namespace ParkPal_BackEnd.Models
 {
     internal class Auction
     {
+        // Fields
         Seller seller;
         Bidder highestBidder;
         int currBid;
 
+        // Props
+        public int CurrBid { get => currBid; set => currBid = value; }
+        internal Seller Seller { get => seller; set => seller = value; }
+        internal Bidder HighestBidder { get => highestBidder; set => highestBidder = value; }
+
+        // Constructors
         public Auction(int currBid, Seller seller, Bidder highestBidder)
         {
             CurrBid = currBid;
@@ -23,13 +30,9 @@ namespace ParkPal_BackEnd.Models
         {
             CurrBid = currBid;
             Seller = seller;
-            Console.WriteLine("auction of " + seller.FirstName + seller.LastName + " was init with starting bid price of " + CurrBid);
+            //Console.WriteLine("auction of " + seller.UserName + " was init with starting bid price of " + CurrBid);
         }
 
-        public int CurrBid { get => currBid; set => currBid = value; }
-        internal Seller Seller { get => seller; set => seller = value; }
-        internal Bidder HighestBidder { get => highestBidder; set => highestBidder = value; }
-    }
+    } // End of class - Auction.
 
-
-}
+} // End of nameSpace - ParkPal_BackEnd.Models.
