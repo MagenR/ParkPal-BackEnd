@@ -165,7 +165,7 @@
     <Compile Include="Controllers\ParkingArrangementsController.cs" />
     <Compile Include="Controllers\ParkingLotsController.cs" />
     <Compile Include="Controllers\UsersController.cs" />
-    <Compile Include="Controllers\ValuesController.cs" />
+    <Compile Include="Controllers\AuctionsController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -174,7 +174,6 @@
     <Compile Include="Models\Bidder.cs" />
     <Compile Include="Models\DAL\DataServices.cs" />
     <Compile Include="Models\DataBaseObject.cs" />
-    <Compile Include="Models\Match.cs" />
     <Compile Include="Models\ParkingArrangement.cs" />
     <Compile Include="Models\ParkingLot.cs" />
     <Compile Include="Models\AppUser.cs" />
