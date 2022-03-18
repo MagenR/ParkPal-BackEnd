@@ -5,19 +5,22 @@ using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using ParkPal_BackEnd.Models;
+using ParkPal_BackEnd.Models.DAL;
 
 namespace ParkPal_BackEnd.Controllers
 {
     [RoutePrefix("api/auctions")]
     public class AuctionsController : ApiController
     {
+        DataServiceDemo dsd;
+
         [HttpGet]
         [Route("auctioncampaigns")]
         public IHttpActionResult Get()
         {
             try
             {
-                List<AuctionCampaign> ac = ParkingLot.Get(); // Later give lot, and space.
+                AuctionCampaign ac = AuctionCampaign.Get(); // Later give lot, and space.
                 if (ac == null)
                     return Content(HttpStatusCode.Conflict, "No parking campaign found.");
                 return Ok(ac);
