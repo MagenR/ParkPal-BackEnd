@@ -172,6 +172,7 @@
     <Compile Include="Models\Auction.cs" />
     <Compile Include="Models\AuctionCampaign.cs" />
     <Compile Include="Models\Bidder.cs" />
+    <Compile Include="Models\DAL\DataServiceDemo.cs" />
     <Compile Include="Models\DAL\DataServices.cs" />
     <Compile Include="Models\DataBaseObject.cs" />
     <Compile Include="Models\ParkingArrangement.cs" />

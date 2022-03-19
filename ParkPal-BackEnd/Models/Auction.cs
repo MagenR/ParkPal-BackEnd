@@ -6,19 +6,28 @@ using System.Threading.Tasks;
 
 namespace ParkPal_BackEnd.Models
 {
-    internal class Auction
+    public class Auction
     {
+        // ----------------------------------------------------------------------------------------
         // Fields
+        // ----------------------------------------------------------------------------------------
+
         Seller seller;
         Bidder highestBidder;
         int currBid;
 
+        // ----------------------------------------------------------------------------------------
         // Props
-        public int CurrBid { get => currBid; set => currBid = value; }
-        internal Seller Seller { get => seller; set => seller = value; }
-        internal Bidder HighestBidder { get => highestBidder; set => highestBidder = value; }
+        // ----------------------------------------------------------------------------------------
 
+        public int CurrBid { get => currBid; set => currBid = value; }
+        public Seller Seller { get => seller; set => seller = value; }
+        public Bidder HighestBidder { get => highestBidder; set => highestBidder = value; }
+
+        // ----------------------------------------------------------------------------------------
         // Constructors
+        // ----------------------------------------------------------------------------------------
+
         public Auction(int currBid, Seller seller, Bidder highestBidder)
         {
             CurrBid = currBid;
