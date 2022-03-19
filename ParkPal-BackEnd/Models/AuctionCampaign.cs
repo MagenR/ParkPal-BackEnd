@@ -3,23 +3,40 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ParkPal_BackEnd.Models.DAL;
 
 namespace ParkPal_BackEnd.Models
 {
-    internal class AuctionCampaign
+    public class AuctionCampaign
     {
+        // ----------------------------------------------------------------------------------------
         // Fields
+        // ----------------------------------------------------------------------------------------
+        
         List<Auction> auctions;
         List<Bidder> bidders;
         List<Seller> sellers;
+        List<string> bidHistory;
 
+        // ----------------------------------------------------------------------------------------
+        // Props
+        // ----------------------------------------------------------------------------------------
+       
+        public List<Auction> Auctions { get => auctions; set => auctions = value; }
+        public List<Bidder> Bidders { get => bidders; set => bidders = value; }
+        public List<Seller> Sellers { get => sellers; set => sellers = value; }
+        public List<string> BidHistory { get => bidHistory; set => bidHistory = value; }
+
+        // ----------------------------------------------------------------------------------------
         // Constructors
-        public AuctionCampaign(List<Auction> auctions, List<Bidder> bidders, List<Seller> sellers)
-        {
-            Auctions = auctions;
-            Bidders = bidders;
-            Sellers = sellers;
-        }
+        // ----------------------------------------------------------------------------------------
+
+        //public AuctionCampaign(List<Auction> auctions, List<Bidder> bidders, List<Seller> sellers)
+        //{
+        //    Auctions = auctions;
+        //    Bidders = bidders;
+        //    Sellers = sellers;
+        //}
 
         public AuctionCampaign(List<Bidder> bidders, List<Seller> sellers)
         {
@@ -28,25 +45,23 @@ namespace ParkPal_BackEnd.Models
             Auctions = initAuctions(sellers);
         }
 
-        public AuctionCampaign(List<Seller> sellers) 
-        {
-            Auctions = initAuctions(sellers);
-        }
+        //public AuctionCampaign(List<Seller> sellers) 
+        //{
+        //    Auctions = initAuctions(sellers);
+        //}
 
-        public AuctionCampaign() { }
+        //public AuctionCampaign() { }
 
-        // Props
-        internal List<Auction> Auctions { get => auctions; set => auctions = value; }
-        internal List<Bidder> Bidders { get => bidders; set => bidders = value; }
-        internal List<Seller> Sellers { get => sellers; set => sellers = value; }
+        // ----------------------------------------------------------------------------------------
+        // Methods
+        // ----------------------------------------------------------------------------------------
 
-        // Methods --------------------------------------------------------------------------------
-        public void run()
+        public void runAuctionCompute()
         {
             autoBid(Auctions, Bidders);
         }
 
-        // Initialize auctions.
+        // Initialize auctions for this campaign with given seller.
         public List<Auction> initAuctions(List<Seller> sellers)
         {
             List<Auction> auctions = new List<Auction>();
@@ -55,35 +70,16 @@ namespace ParkPal_BackEnd.Models
             return auctions;
         }
 
-        // Place a bid on the lowest auction.
+        // Place a bid on a given auction.
         public void placeNewBid(Auction auction, Bidder bidder)
         {
             if(bidder.BidLimit > auction.CurrBid)
             {
                 if(auction.HighestBidder != null)
                     auction.CurrBid++;
-                Console.WriteLine( bidder.UserName + " bid on " + auction.Seller.UserName + "'s Auction " + auction.CurrBid + " money.");
+                //Console.WriteLine( bidder.UserName + " bid on " + auction.Seller.UserName + "'s Auction " + auction.CurrBid + " money.");
                 auction.HighestBidder = bidder;
             }
-        }
-
-        // Run over bidders list and auto increment if possible.
-        public void autoBid(List<Auction> auctions, List<Bidder> bidders)
-        {
-            bool noBidMade = false;
-            while (!noBidMade)
-                foreach (Bidder bidder in bidders)
-                    if(outbid(bidder, auctions))
-                        placeNewBid(findLowestAuction(auctions), bidder);
-        }
-
-        // Checks if user was outbid in campaign.
-        public bool outbid(Bidder bidder, List<Auction> auctions)
-        {
-            foreach (Auction auction in auctions)
-                if (auction.HighestBidder == bidder)
-                    return false;
-            return true;
         }
 
         // Find auction with lowest bid.
@@ -100,10 +96,54 @@ namespace ParkPal_BackEnd.Models
             return lowestAuc;
         }
 
+        // Checks if user was outbid in campaign.
+        public bool outbid(Bidder bidder, List<Auction> auctions)
+        {
+            foreach (Auction auction in auctions)
+                if (auction.HighestBidder == bidder)
+                    return false;
+            return true;
+        }
+
+        // Run over bidders list and assign them for an auction if possible.
+        public void autoBid(List<Auction> auctions, List<Bidder> bidders)
+        {
+            bool noBidMade = false;
+            while (!noBidMade)
+                foreach (Bidder bidder in bidders)
+                    if(outbid(bidder, auctions))
+                        placeNewBid(findLowestAuction(auctions), bidder);
+        }
+
         // Returns this campaign upon controller request.
         public AuctionCampaign Get()
         {
             return this;
+        }
+
+        // Adds bidder/seller to the campaign
+        public int Insert(object o)
+        {
+            if (o is Bidder)
+                Bidders.Add((Bidder)o);
+            else if (o is Seller)
+                Sellers.Add((Seller)o);
+            return 1; // No reason to fail.
+        }
+
+        // Update bidder bids list by name - WORK IN PROGRESS!!!!
+        public int UpdateBidderBids(List<Bidder> bl)
+        {
+            foreach (Bidder bidder in bl)
+            {
+                Bidder b = Bidders.Where(bidder.UserName => b.UserName = UpdatedBidder.UserName);
+            }
+        }
+
+        public int Update(object o)
+        {
+            if (o is List<Bidder>)
+                UpdateBidderBids((List<Bidder>)o);
         }
 
     }  // End of class - AuctionCampaign.

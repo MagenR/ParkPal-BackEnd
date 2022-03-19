@@ -4,22 +4,33 @@ using System.Text;
 
 namespace ParkPal_BackEnd.Models
 {
-    class Seller : AppUser, IComparable
+    public class Seller : AppUser, IComparable
     {
+        // ----------------------------------------------------------------------------------------
         // Fields
+        // ----------------------------------------------------------------------------------------
+
         int minSellingPrice;
         //Auction owningAuction;
 
+        // ----------------------------------------------------------------------------------------
         // Props
+        // ----------------------------------------------------------------------------------------
+
         public int MinSellingPrice { get => minSellingPrice; set => minSellingPrice = value; }
 
+        // ----------------------------------------------------------------------------------------
         // Constructors
+        // ----------------------------------------------------------------------------------------
+
         public Seller(int minSellingPrice, string username) : base(username)
         {
             MinSellingPrice = minSellingPrice;
         }
 
-        // Methods --------------------------------------------------------------------------------
+        // ----------------------------------------------------------------------------------------
+        // Methods
+        // ----------------------------------------------------------------------------------------
 
         // Sort the bidders by bid limit desc.
         public int CompareTo(object obj) // Sort Asc.
