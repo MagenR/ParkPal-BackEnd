@@ -7,9 +7,10 @@ $(document).ready(function () {
     $('#UpdateBtn').click(update);
     $('#AddSBtn').click(postSeller);
     $('#AddBBtn').click(postBidder);
+    $('#Update').click(updateBidderBid);
     renderText();
     getAuction();
-
+    
 });
 
 // ---------------------------------------------- Get --------------------------------------------------
@@ -78,13 +79,31 @@ function postBidderErrorCB(err) {
     swal("Error!", err.responseJSON.Message, "error");
 }
 
+function updateBidderBid() {
+    let updateBid = {
+        username: $('#UserNameBidderUpdate').val(),
+        BidLimit: $('#newPrice').val(),
+    }
+    let api = "../api/Auctions/putacbidder";
+    ajaxCall("PUT", api, JSON.stringify(updateBid), putBidderSuccessCB, putBidderErrorCB);
+}
+
+function putBidderSuccessCB(msg) {
+    getAuction();
+}
+
+function putBidderErrorCB(err) {
+    console.log(err.status + " " + err.responseJSON.Message);
+    swal("Error!", err.responseJSON.Message, "error");
+}
 
 // ---------------------------------------------- List Renders ----------------------------------------------
+
 
 function renderAuction(auction) {
     renderBidders(auction.Bidders);
     renderSellers(auction.Sellers);
-    renderLeaders(auction.Auctions);
+       (auction.Auctions);
 }
 
 function renderBidders(bidders) {
@@ -213,6 +232,6 @@ function addBidder() {
 }
 
 function update() {
-    $('#Update').modal('show');
+    $('#UpdateModal').modal('show');
 }
 
