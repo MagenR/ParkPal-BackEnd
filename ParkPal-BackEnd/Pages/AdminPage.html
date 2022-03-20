@@ -70,7 +70,7 @@
                     <div class="row">
                         <div class="col">
                             <div class="card mb-4">
-                                <div class="card-header" id="TableName">
+                                <div class="card-header" id="biddersTableName">
                                     <i class="fas fa-table me-1"></i>
                                     *Table Name Here*
                                 </div>
@@ -82,45 +82,55 @@
                         </div>
                         <div class="col">
                             <div class="card mb-4">
-                                <div class="card-header">
+                                <div class="card-header" id="sellersTableName">
                                     <i class="fas fa-table me-1"></i>
                                     *Table Name Here*
                                 </div>
                                 <div class="card-body">
-                                    <table id="sllersTable" class="table table-striped" width="100%">
+                                    <table id="sellersTable" class="table table-striped" width="100%">
                                     </table>
                                 </div>
                             </div>
                         </div>
                     </div>
+                    <div class="row">
+                            <div class="card mb-4">
+                                <div class="card-header" id="auctionTableName">
+                                    <i class="fas fa-table me-1"></i>
+                                    *Table Name Here*
+                                </div>
+                                <div class="card-body">
+                                    <table id="auctionsTable" class="table table-striped" width="100%">
+                                    </table>
+                                </div>
+                        </div>
 
-
-                </div>
-                <!-- Make a Bid Modal -->
-                <div class="modal fade" id="makeAbidModal" tabindex="-1" aria-labelledby="makeAbidModalLabel" aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h4 class="modal-title" id="makeAbidModalLabel">Make a Bid</h4>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body container">
-                                <img class="img-fluid mb-3" src="" />
-                                <h5>User name:</h5>
-                                <input id="userName"/>
-                                <h5>Bid</h5>
-                                <input id="bid"/>
-                                <h5>Max Bid</h5>
-                                <input id="maxBid"/>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                <button type="button" class="btn btn-primary" id="MakeAbidBtn">Make The Bid</button>
+                    </div>
+                    <!-- Make a Bid Modal -->
+                    <div class="modal fade" id="makeAbidModal" tabindex="-1" aria-labelledby="makeAbidModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h4 class="modal-title" id="makeAbidModalLabel">Make a Bid</h4>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body container">
+                                    <img class="img-fluid mb-3" src="" />
+                                    <h5>User name:</h5>
+                                    <input id="userName" />
+                                    <h5>Bid</h5>
+                                    <input id="bid" />
+                                    <h5>Max Bid</h5>
+                                    <input id="maxBid" />
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                    <button type="button" class="btn btn-primary" id="MakeAbidBtn">Make The Bid</button>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            </main>
+</main>
             <footer class="py-4 bg-light mt-auto">
                 <div class="container-fluid px-4">
                     <div class="d-flex align-items-center justify-content-between small">
