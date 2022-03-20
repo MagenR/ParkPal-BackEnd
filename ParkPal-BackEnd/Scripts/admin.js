@@ -68,7 +68,7 @@ function postAuctionErrorCB(err) {
 function renderAuction(auction) {
     renderBidders(auction.Bidders);
     renderSellers(auction.Sellers);
-
+    renderLeaders(auction.Auctions);
 }
 
 function renderBidders(bidders) {
@@ -91,12 +91,83 @@ function renderBidders(bidders) {
     );
 
     try {
-        tbl = $().DataTable({
+        tbl = $('#biddersTable').DataTable({
             data: bidders,
             pageLength: 10,
             columns: [
                 { data: "UserName" },
                 { data: "BidLimit" }
+            ],
+        });
+    }
+    catch (err) {
+        alert(err);
+    }
+}
+
+function renderSellers(sellers) {
+
+    $().html(
+        '<thead>' +
+        '<tr>' +
+        '<th>UserName</th>' +
+        '<th>MinSellingPrice</th>' +
+        '</tr>' +
+        '</thead>' +
+        '<tbody>' +
+        '</tbody>' +
+        '<tfoot>' +
+        '<tr>' +
+        '<th>UserName</th>' +
+        '<th>MinSellingPrice</th>' +
+        '</tr>' +
+        '</tfoot>'
+    );
+
+    try {
+        tbl = $('#sellersTable').DataTable({
+            data: sellers,
+            pageLength: 10,
+            columns: [
+                { data: "UserName" },
+                { data: "MinSellingPrice" }
+            ],
+        });
+    }
+    catch (err) {
+        alert(err);
+    }
+}
+
+function renderLeaders(auctions) {
+
+    $().html(
+        '<thead>' +
+        '<tr>' +
+        '<th>Seller Name</th>' +
+        '<th>Highest Bidder</th>' +
+        '<th>CurrentBid</th>' +
+        '</tr>' +
+        '</thead>' +
+        '<tbody>' +
+        '</tbody>' +
+        '<tfoot>' +
+        '<tr>' +
+        '<th>Seller Name</th>' +
+        '<th>Highest Bidder</th>' +
+        '<th>CurrentBid</th>' +
+        '</tr>' +
+        '</tfoot>'
+    );
+
+    try {
+        tbl = $('#LeadingRecords').DataTable({
+            data: auctions,
+            pageLength: 10,
+            columns: [
+                { data: "Seller.UserName" },
+                { data: "HighestBidder.UserName" },
+                { data: "CurrBid" }
             ],
         });
     }
@@ -134,5 +205,5 @@ function renderText(choice) {
 
     $('#MainHeading').html(MainHeading);
     $('#MainText').html(MainText);
-    $('#TableName').html('<i class="fas fa-table me-1"></i>' + TableName);
+    //$('#TableName').html('<i class="fas fa-table me-1"></i>' + TableName);
 }
