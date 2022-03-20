@@ -85,6 +85,7 @@ function renderAuction(auction) {
     renderBidders(auction.Bidders);
     renderSellers(auction.Sellers);
     renderLeaders(auction.Auctions);
+    renderHistory(auction.BidHistory)
 }
 
 function renderBidders(bidders) {
@@ -114,6 +115,7 @@ function renderBidders(bidders) {
                 { data: "UserName" },
                 { data: "BidLimit" }
             ],
+            "destroy": true,
         });
     }
     catch (err) {
@@ -148,6 +150,7 @@ function renderSellers(sellers) {
                 { data: "UserName" },
                 { data: "MinSellingPrice" }
             ],
+            "destroy": true,
         });
     }
     catch (err) {
@@ -185,6 +188,7 @@ function renderLeaders(auctions) {
                 { data: "HighestBidder.UserName" },
                 { data: "CurrBid" }
             ],
+            "destroy": true,
         });
     }
     catch (err) {
@@ -193,6 +197,14 @@ function renderLeaders(auctions) {
 }
 
 // ---------------------------------------------- Dynamic text input ----------------------------------------------
+
+function renderHistory(historyList) {
+    $('#MainText').html('');
+    $('#MainText').append('<p>');
+    for (let h = 0; h < historyList.length; h++)
+        $('#MainText').append(historyList[h] + '<br>')
+    $('#MainText').append('</p>');
+}
 
 function renderText() {
 

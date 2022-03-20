@@ -42,7 +42,8 @@ namespace ParkPal_BackEnd.Models
         {
             Bidders = bidders;
             Sellers = sellers;
-            Auctions = initAuctions(sellers);
+            BidHistory = new List<string>();
+            Auctions = initAuctions(sellers);         
         }
 
         //public AuctionCampaign(List<Seller> sellers) 
@@ -61,12 +62,25 @@ namespace ParkPal_BackEnd.Models
             autoBid(Auctions, Bidders);
         }
 
+        // Reinit after bidder and seller insert.
+        public int reInit()
+        {
+            BidHistory.Clear();
+            Auctions = initAuctions(Sellers); 
+            return 1;
+        }
+
         // Initialize auctions for this campaign with given seller.
         public List<Auction> initAuctions(List<Seller> sellers)
         {
             List<Auction> auctions = new List<Auction>();
             foreach (Seller seller in sellers)
+            {
                 auctions.Add(new Auction(seller.MinSellingPrice, seller));
+                string h = seller.UserName + "'s auction was initialized with starting price: " + seller.MinSellingPrice;
+                BidHistory.Add(h);
+            }
+               
             return auctions;
         }
 
@@ -77,7 +91,8 @@ namespace ParkPal_BackEnd.Models
             {
                 if (auction.HighestBidder != null)
                     auction.CurrBid++;
-                //Console.WriteLine(bidder.Name + " bid on " + auction.Seller.Name + "'s Auction " + auction.CurrBid + " money.");
+                string h = bidder.UserName + " bid on " + auction.Seller.UserName + "'s Auction, " + auction.CurrBid + " money.";
+                BidHistory.Add(h);
                 auction.HighestBidder = bidder;
                 //bidder.CurrentLead = auction;
                 //bidder.CurrentBid = auction.CurrBid;
@@ -142,12 +157,17 @@ namespace ParkPal_BackEnd.Models
             if (o is Bidder)
                 Bidders.Add((Bidder)o);
             else if (o is Seller)
-                Sellers.Add((Seller)o);
+            {
+                Seller s = (Seller)o;
+                Sellers.Add(s);
+                auctions.Add(new Auction(s.MinSellingPrice, s));
+            }
+            reInit();
             return 1; // No reason to fail.
         }
 
         // Update bidder bids list by name - WORK IN PROGRESS!!!!
-        public int UpdateBidderBids(List<Bidder> bl)
+        public int UpdateBidderListBids(List<Bidder> bl)
         {
             foreach (Bidder bidder in bl)
             {
@@ -157,12 +177,19 @@ namespace ParkPal_BackEnd.Models
             return 1;
         }
 
+        public int UpdateBidderBids(Bidder b)
+        {
+            Bidder foundBidder = Bidders.First(testedBidder => testedBidder.UserName == b.UserName);
+            foundBidder.BidLimit = b.BidLimit;
+            return 1;
+        }
+
 
         public int Update(object o)
         {
-            if (o is List<Bidder>)
-                return UpdateBidderBids((List<Bidder>)o);
-            return 0;
+            if (o is Bidder)
+                return UpdateBidderBids((Bidder)o);
+            return 1;
         }
 
     }  // End of class - AuctionCampaign.
