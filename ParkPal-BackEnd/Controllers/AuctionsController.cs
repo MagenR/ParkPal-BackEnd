@@ -20,6 +20,7 @@ namespace ParkPal_BackEnd.Controllers
             try
             {
                 AuctionCampaign ac = DataServiceDemo.ac; // Later give lot, and space.
+                ac.runAuctionCompute();
                 if (ac == null)
                     return Content(HttpStatusCode.Conflict, "No parking auction campaign found.");
                 return Ok(ac);
@@ -37,6 +38,8 @@ namespace ParkPal_BackEnd.Controllers
         }
 
         // Insert a new seller to the auction campaign.
+        [HttpPost]
+        [Route("postacseller")]
         public IHttpActionResult PostSeller([FromBody] Seller c)
         {
             try
@@ -52,6 +55,8 @@ namespace ParkPal_BackEnd.Controllers
         }
 
         // Insert a new bidder to the auction campaign.
+        [HttpPost]
+        [Route("postacbidder")]
         public IHttpActionResult PostBidder([FromBody] Bidder b)
         {
             try
@@ -66,6 +71,9 @@ namespace ParkPal_BackEnd.Controllers
             }
         }
 
+        // Update a bidder's bid (if a single bidder form exists).
+        [HttpPut]
+        [Route("putacbidder")]
         public IHttpActionResult PutBidder([FromBody] List<Bidder> b)
         {
             try
@@ -80,7 +88,9 @@ namespace ParkPal_BackEnd.Controllers
             }
         }
 
-        // Update a bidder with new bid.
+        // Update a bidder list with new bid (if editing table and pressing save).
+        [HttpPut]
+        [Route("putacbidderlist")]
         public IHttpActionResult PutBidderList([FromBody] List<Bidder> bc)
         {
             try

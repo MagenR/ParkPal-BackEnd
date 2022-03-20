@@ -136,14 +136,18 @@ namespace ParkPal_BackEnd.Models
         {
             foreach (Bidder bidder in bl)
             {
-                Bidder b = Bidders.Where(bidder.UserName => b.UserName = UpdatedBidder.UserName);
+                Bidder currBidder = Bidders.First(testedBidder => testedBidder.UserName == bidder.UserName);
+                currBidder.BidLimit = bidder.BidLimit;
             }
+            return 1;
         }
+
 
         public int Update(object o)
         {
             if (o is List<Bidder>)
-                UpdateBidderBids((List<Bidder>)o);
+                return UpdateBidderBids((List<Bidder>)o);
+            return 0;
         }
 
     }  // End of class - AuctionCampaign.
