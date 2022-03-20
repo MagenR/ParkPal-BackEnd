@@ -3,15 +3,8 @@
 
 $(document).ready(function () {
 
-    const queryString = window.location.search;
-    const urlParams = new URLSearchParams(queryString);
-    var urlParam = 'addBuyer'; // Set Default param to auction.
-    urlParam = urlParams.get('category');
-    renderText(urlParam);
-    //$('#makeAbidModal').on('click', '#MakeAbidBtn', function () {
-    //    postAuction();
-    //});
-    //getAuction();
+    renderText();
+    getAuction();
 
 });
 
@@ -176,34 +169,13 @@ function renderLeaders(auctions) {
     }
 }
 
-function showModal() {
-    $('#makeAbidModal').modal('show');
-}
-
 // ---------------------------------------------- Dynamic text input ----------------------------------------------
 
-function renderText(choice) {
+function renderText() {
 
-    var MainHeading;
-    var MainText;
-    var TableName;
-
-    switch (choice) {
-        case 'addBuyer':
-            MainHeading = 'Auction Data Base';
-            MainText = 'All the bidding for this parking lot.';
-            TableName = 'Auction';
-            showModal();
-            break;
-        case 'auction':
-        default:
-            MainHeading = 'Auction Data Base';
-            MainText = 'All the bidding for this parking lot.';
-            TableName = 'Auction';
-            getAuction();
-    }
-
+    var MainHeading = 'Auction Data Base';
+    var MainText = 'All the bidding for this parking lot.';
     $('#MainHeading').html(MainHeading);
     $('#MainText').html(MainText);
-    //$('#TableName').html('<i class="fas fa-table me-1"></i>' + TableName);
+ 
 }
