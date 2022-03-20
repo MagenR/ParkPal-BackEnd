@@ -11,14 +11,16 @@ namespace ParkPal_BackEnd.Models
         // ----------------------------------------------------------------------------------------
 
         int bidLimit;
-        //List<Auction> biddingAuctions;
-        //Auction currentLead;
+        int currentBid;
+        Auction currentLead;
 
         // ----------------------------------------------------------------------------------------
         // Props
         // ----------------------------------------------------------------------------------------
 
         public int BidLimit { get => bidLimit; set => bidLimit = value; }
+        public int CurrentBid { get => currentBid; set => currentBid = value; }
+        public Auction CurrentLead { get => currentLead; set => currentLead = value; }
 
         // ----------------------------------------------------------------------------------------
         // Constructors

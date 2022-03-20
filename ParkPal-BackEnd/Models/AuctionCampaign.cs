@@ -12,7 +12,7 @@ namespace ParkPal_BackEnd.Models
         // ----------------------------------------------------------------------------------------
         // Fields
         // ----------------------------------------------------------------------------------------
-        
+
         List<Auction> auctions;
         List<Bidder> bidders;
         List<Seller> sellers;
@@ -21,7 +21,7 @@ namespace ParkPal_BackEnd.Models
         // ----------------------------------------------------------------------------------------
         // Props
         // ----------------------------------------------------------------------------------------
-       
+
         public List<Auction> Auctions { get => auctions; set => auctions = value; }
         public List<Bidder> Bidders { get => bidders; set => bidders = value; }
         public List<Seller> Sellers { get => sellers; set => sellers = value; }
@@ -66,20 +66,24 @@ namespace ParkPal_BackEnd.Models
         {
             List<Auction> auctions = new List<Auction>();
             foreach (Seller seller in sellers)
-                auctions.Add(new Auction(seller.MinSellingPrice, seller));            
+                auctions.Add(new Auction(seller.MinSellingPrice, seller));
             return auctions;
         }
 
         // Place a bid on a given auction.
-        public void placeNewBid(Auction auction, Bidder bidder)
+        public bool placeNewBid(Auction auction, Bidder bidder)
         {
-            if(bidder.BidLimit > auction.CurrBid)
+            if (bidder.BidLimit > auction.CurrBid)
             {
-                if(auction.HighestBidder != null)
+                if (auction.HighestBidder != null)
                     auction.CurrBid++;
-                //Console.WriteLine( bidder.UserName + " bid on " + auction.Seller.UserName + "'s Auction " + auction.CurrBid + " money.");
+                //Console.WriteLine(bidder.Name + " bid on " + auction.Seller.Name + "'s Auction " + auction.CurrBid + " money.");
                 auction.HighestBidder = bidder;
+                //bidder.CurrentLead = auction;
+                //bidder.CurrentBid = auction.CurrBid;
+                return true;
             }
+            return false;
         }
 
         // Find auction with lowest bid.
@@ -108,11 +112,22 @@ namespace ParkPal_BackEnd.Models
         // Run over bidders list and assign them for an auction if possible.
         public void autoBid(List<Auction> auctions, List<Bidder> bidders)
         {
-            bool noBidMade = false;
-            while (!noBidMade)
+            bool bidUpdated = true, bidWasPlaced = false;
+            while (bidUpdated)
+            {
+                bidUpdated = false;
                 foreach (Bidder bidder in bidders)
-                    if(outbid(bidder, auctions))
-                        placeNewBid(findLowestAuction(auctions), bidder);
+                {
+                    if (outbid(bidder, auctions))
+                    {
+                        //bidder.CurrentLead = null;
+                        bidWasPlaced = placeNewBid(findLowestAuction(auctions), bidder);
+                        if (bidUpdated == false && bidWasPlaced == true)
+                            bidUpdated = true;
+                    }
+
+                }
+            }
         }
 
         // Returns this campaign upon controller request.

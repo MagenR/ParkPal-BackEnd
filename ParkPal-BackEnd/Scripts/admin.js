@@ -8,9 +8,10 @@ $(document).ready(function () {
     var urlParam = 'addBuyer'; // Set Default param to auction.
     urlParam = urlParams.get('category');
     renderText(urlParam);
-    $('#makeAbidModal').on('click', '#MakeAbidBtn', function () {
-        postAuction();
-    });
+    //$('#makeAbidModal').on('click', '#MakeAbidBtn', function () {
+    //    postAuction();
+    //});
+    //getAuction();
 
 });
 
@@ -18,12 +19,13 @@ $(document).ready(function () {
 
 // Get users list for admin use.
 function getAuction() {
-    let api = "../api/Auction";
+    let api = "../api/Auctions/auctioncampaigns";
 
     ajaxCall("GET", api, "", getAuctionSuccessCB, getErrorCB);
 }
 
 function getAuctionSuccessCB(auction) {
+    console.log(auction);
     renderAuction(auction);
 }
 
@@ -64,34 +66,37 @@ function postAuctionErrorCB(err) {
 // ---------------------------------------------- List Renders ----------------------------------------------
 
 function renderAuction(auction) {
+    renderBidders(auction.Bidders);
+    renderSellers(auction.Sellers);
 
-    $('#dataTableInsert').html(
+}
+
+function renderBidders(bidders) {
+
+    $().html(
         '<thead>' +
         '<tr>' +
-        '<th>User Name</th>' +
-        '<th>Bid</th>' +
-        '<th>Max Bid</th>' +
+        '<th>UserName</th>' +
+        '<th>BidLimit</th>' +
         '</tr>' +
         '</thead>' +
         '<tbody>' +
         '</tbody>' +
         '<tfoot>' +
         '<tr>' +
-        '<th>User Name</th>' +
-        '<th>Bid</th>' +
-        '<th>Max Bid</th>' +
+        '<th>UserName</th>' +
+        '<th>BidLimit</th>' +
         '</tr>' +
         '</tfoot>'
     );
 
     try {
-        tbl = $('#dataTableInsert').DataTable({
-            data: auction,
+        tbl = $().DataTable({
+            data: bidders,
             pageLength: 10,
             columns: [
-                { data: "User Name" },
-                { data: "Bid" },
-                { data: "Max Bid" },
+                { data: "UserName" },
+                { data: "BidLimit" }
             ],
         });
     }
