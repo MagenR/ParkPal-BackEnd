@@ -74,7 +74,7 @@ namespace ParkPal_BackEnd.Controllers
         // Update a bidder's bid (if a single bidder form exists).
         [HttpPut]
         [Route("putacbidder")]
-        public IHttpActionResult PutBidder([FromBody] List<Bidder> b)
+        public IHttpActionResult PutBidder([FromBody] Bidder b)
         {
             try
             {
@@ -88,26 +88,26 @@ namespace ParkPal_BackEnd.Controllers
             }
         }
 
-        // Update a bidder list with new bid (if editing table and pressing save).
-        [HttpPut]
-        [Route("putacbidderlist")]
-        public IHttpActionResult PutBidderList([FromBody] List<Bidder> bc)
-        {
-            try
-            {
-                if (DataServiceDemo.ac.Update(bc) == 0)
-                    return Content(HttpStatusCode.Conflict, "Error. Could not update the bidder list.");
-                return Ok("bidder list updated succesfully!");
-            }
-            catch (Exception ex)
-            {
-                return Content(HttpStatusCode.Conflict, "Error.Updating bidder list failed.\n" + ex.Message);
-            }
-        }
+        //// Update a bidder list with new bid (if editing table and pressing save).
+        //[HttpPut]
+        //[Route("putacbidderlist")]
+        //public IHttpActionResult PutBidderList([FromBody] List<Bidder> bc)
+        //{
+        //    try
+        //    {
+        //        if (DataServiceDemo.ac.Update(bc) == 0)
+        //            return Content(HttpStatusCode.Conflict, "Error. Could not update the bidder list.");
+        //        return Ok("bidder list updated succesfully!");
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return Content(HttpStatusCode.Conflict, "Error.Updating bidder list failed.\n" + ex.Message);
+        //    }
+        //}
 
-        // DELETE api/values/5
-        public void Delete(int id)
-        {
-        }
+        //// DELETE api/values/5
+        //public void Delete(int id)
+        //{
+        //}
     }
 }
