@@ -9,7 +9,7 @@ using ParkPal_BackEnd.Models.DAL;
 
 namespace ParkPal_BackEnd.Controllers
 {
-    [RoutePrefix("api/auctions")]
+    [RoutePrefix("api/Auctions")]
     public class AuctionsController : ApiController
     {
 
