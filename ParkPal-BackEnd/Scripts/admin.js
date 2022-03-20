@@ -12,8 +12,8 @@ $(document).ready(function () {
 
 // Get users list for admin use.
 function getAuction() {
-    let api = "../api/Auctions/auctioncampaigns";
-
+    let api = "../api/Auctions/auctioncampaigns"; 
+    
     ajaxCall("GET", api, "", getAuctionSuccessCB, getErrorCB);
 }
 
@@ -178,4 +178,54 @@ function renderText() {
     $('#MainHeading').html(MainHeading);
     $('#MainText').html(MainText);
  
+}
+// ---------------------------------------------- Insert buttons ----------------------------------------------
+$('#AddSellerBtn').click(addSeller);
+
+function addSeller() {
+    $('#AddSeller').modal('show');
+}
+
+$('#AddSBtn').click(alertMsg);
+
+$('#AddBidderBtn').click(addBidder);
+
+
+function alertMsg(id) {
+    alert("Added successfully");
+    $("#AddSeller").modal('hide');
+    renderSellers();
+}
+
+function addBidder() {
+    $('#AddBidder').modal('show');
+}
+
+$('#UpdateBtn').click(update);
+
+function update() {
+    $('#Update').modal('show');
+}
+
+function postSeller() {
+
+    let newSeller = {
+        User_Name: $('#UserNameSeller').val(),
+        Min_Price: $('#minPrice').val(),
+    }
+
+    let api = "../api/postacseller";
+    ajaxCall("POST", api, JSON.stringify(newSeller), postSellerSuccessCB, postSellerErrorCB);
+}
+
+function postSellerSuccessCB(seller) {
+    console.log(seller);
+}
+
+function postSellerErrorCB(err) {
+    console.log(err.status + " " + err.responseJSON.Message);
+    if (err.status == '404')
+        swal("Error!", "404: " + err.responseJSON.Message, "error");
+    else
+        swal("Error!", err.responseJSON.Message, "error");
 }
