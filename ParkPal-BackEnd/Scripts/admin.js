@@ -2,7 +2,11 @@
 // ---------------------------------------- Constroller functions--------------------------
 
 $(document).ready(function () {
-
+    $('#AddSellerBtn').click(addSeller);
+    $('#AddBidderBtn').click(addBidder);
+    $('#UpdateBtn').click(update);
+/*    $('#AddSBtn').click(postSeller);*/
+    $('#AddBBtn').click(postBidder);
     renderText();
     getAuction();
 
@@ -34,23 +38,42 @@ function getErrorCB(err) {
 // ---------------------------------------------- Post -------------------------------------------------
 
 
-function postAuction() {
+function postSeller() {
 
     let newBid = {
-        User_Name: $('#userName').val(),
-        Bid: $('#bid').val(),
-        Max_Bid: $('#maxBid').val(),
+        User_Name: $('#UserNameSeller').val(),
+        minSellingPrice: $('#minPrice').val(),
     }
 
-    let api = "../api/Auction";
-    ajaxCall("POST", api, JSON.stringify(newBid), postAuctionSuccessCB, postAuctionErrorCB);
+    let api = "../api/Auction/postacseller";
+    ajaxCall("POST", api, JSON.stringify(newBid), postSellerSuccessCB, postSellerErrorCB);
 }
 
-function postAuctionSuccessCB(msg) {
+function postSellerSuccessCB(msg) {
     getAuction();
 }
 
-function postAuctionErrorCB(err) {
+function postSellerErrorCB(err) {
+    console.log(err.status + " " + err.responseJSON.Message);
+    swal("Error!", err.responseJSON.Message, "error");
+}
+
+function postBidder() {
+
+    let newBid = {
+        User_Name: $('#UserNameBidder').val(),
+        bidLimit: $('#maxPrice').val(),
+    }
+
+    let api = "../api/Auction/postacbidder";
+    ajaxCall("POST", api, JSON.stringify(newBid), postBidderSuccessCB, postBidderErrorCB);
+}
+
+function postBidderSuccessCB(msg) {
+    getAuction();
+}
+
+function postBidderErrorCB(err) {
     console.log(err.status + " " + err.responseJSON.Message);
     swal("Error!", err.responseJSON.Message, "error");
 }
@@ -180,52 +203,23 @@ function renderText() {
  
 }
 // ---------------------------------------------- Insert buttons ----------------------------------------------
-$('#AddSellerBtn').click(addSeller);
 
 function addSeller() {
     $('#AddSeller').modal('show');
 }
 
-$('#AddSBtn').click(alertMsg);
 
-$('#AddBidderBtn').click(addBidder);
-
-
-function alertMsg(id) {
-    alert("Added successfully");
-    $("#AddSeller").modal('hide');
-    renderSellers();
-}
+//function alertMsg(id) {
+//    alert("Added successfully");
+//    $("#AddSeller").modal('hide');
+//    renderSellers();
+//}
 
 function addBidder() {
     $('#AddBidder').modal('show');
 }
 
-$('#UpdateBtn').click(update);
-
 function update() {
     $('#Update').modal('show');
 }
 
-function postSeller() {
-
-    let newSeller = {
-        User_Name: $('#UserNameSeller').val(),
-        Min_Price: $('#minPrice').val(),
-    }
-
-    let api = "../api/postacseller";
-    ajaxCall("POST", api, JSON.stringify(newSeller), postSellerSuccessCB, postSellerErrorCB);
-}
-
-function postSellerSuccessCB(seller) {
-    console.log(seller);
-}
-
-function postSellerErrorCB(err) {
-    console.log(err.status + " " + err.responseJSON.Message);
-    if (err.status == '404')
-        swal("Error!", "404: " + err.responseJSON.Message, "error");
-    else
-        swal("Error!", err.responseJSON.Message, "error");
-}
