@@ -5,7 +5,7 @@ $(document).ready(function () {
     $('#AddSellerBtn').click(addSeller);
     $('#AddBidderBtn').click(addBidder);
     $('#UpdateBtn').click(update);
-/*    $('#AddSBtn').click(postSeller);*/
+    $('#AddSBtn').click(postSeller);
     $('#AddBBtn').click(postBidder);
     renderText();
     getAuction();
@@ -41,11 +41,11 @@ function getErrorCB(err) {
 function postSeller() {
 
     let newBid = {
-        User_Name: $('#UserNameSeller').val(),
+        UserName: $('#UserNameSeller').val(),
         minSellingPrice: $('#minPrice').val(),
     }
 
-    let api = "../api/Auction/postacseller";
+    let api = "../api/Auctions/postacseller";
     ajaxCall("POST", api, JSON.stringify(newBid), postSellerSuccessCB, postSellerErrorCB);
 }
 
@@ -61,11 +61,11 @@ function postSellerErrorCB(err) {
 function postBidder() {
 
     let newBid = {
-        User_Name: $('#UserNameBidder').val(),
-        bidLimit: $('#maxPrice').val(),
+        UserName: $('#UserNameBidder').val(),
+        BidLimit: $('#maxPrice').val(),
     }
 
-    let api = "../api/Auction/postacbidder";
+    let api = "../api/Auctions/postacbidder";
     ajaxCall("POST", api, JSON.stringify(newBid), postBidderSuccessCB, postBidderErrorCB);
 }
 
@@ -207,13 +207,6 @@ function renderText() {
 function addSeller() {
     $('#AddSeller').modal('show');
 }
-
-
-//function alertMsg(id) {
-//    alert("Added successfully");
-//    $("#AddSeller").modal('hide');
-//    renderSellers();
-//}
 
 function addBidder() {
     $('#AddBidder').modal('show');
