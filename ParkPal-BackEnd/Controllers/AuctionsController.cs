@@ -20,7 +20,6 @@ namespace ParkPal_BackEnd.Controllers
             try
             {
                 AuctionCampaign ac = DataServiceDemo.ac; // Later give lot, and space.
-                ac.runAuctionCompute();
                 if (ac == null)
                     return Content(HttpStatusCode.Conflict, "No parking auction campaign found.");
                 return Ok(ac);
