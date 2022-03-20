@@ -7,10 +7,9 @@ $(document).ready(function () {
     $('#UpdateBtn').click(update);
     $('#AddSBtn').click(postSeller);
     $('#AddBBtn').click(postBidder);
-    $('#Update').click(updateBidderBid);
     renderText();
     getAuction();
-    
+
 });
 
 // ---------------------------------------------- Get --------------------------------------------------
@@ -79,31 +78,14 @@ function postBidderErrorCB(err) {
     swal("Error!", err.responseJSON.Message, "error");
 }
 
-function updateBidderBid() {
-    let updateBid = {
-        username: $('#UserNameBidderUpdate').val(),
-        BidLimit: $('#newPrice').val(),
-    }
-    let api = "../api/Auctions/putacbidder";
-    ajaxCall("PUT", api, JSON.stringify(updateBid), putBidderSuccessCB, putBidderErrorCB);
-}
-
-function putBidderSuccessCB(msg) {
-    getAuction();
-}
-
-function putBidderErrorCB(err) {
-    console.log(err.status + " " + err.responseJSON.Message);
-    swal("Error!", err.responseJSON.Message, "error");
-}
 
 // ---------------------------------------------- List Renders ----------------------------------------------
-
 
 function renderAuction(auction) {
     renderBidders(auction.Bidders);
     renderSellers(auction.Sellers);
-       (auction.Auctions);
+    renderLeaders(auction.Auctions);
+    renderHistory(auction.BidHistory)
 }
 
 function renderBidders(bidders) {
@@ -133,6 +115,7 @@ function renderBidders(bidders) {
                 { data: "UserName" },
                 { data: "BidLimit" }
             ],
+            "destroy": true,
         });
     }
     catch (err) {
@@ -167,6 +150,7 @@ function renderSellers(sellers) {
                 { data: "UserName" },
                 { data: "MinSellingPrice" }
             ],
+            "destroy": true,
         });
     }
     catch (err) {
@@ -204,6 +188,7 @@ function renderLeaders(auctions) {
                 { data: "HighestBidder.UserName" },
                 { data: "CurrBid" }
             ],
+            "destroy": true,
         });
     }
     catch (err) {
@@ -212,6 +197,14 @@ function renderLeaders(auctions) {
 }
 
 // ---------------------------------------------- Dynamic text input ----------------------------------------------
+
+function renderHistory(historyList) {
+    $('#MainText').html('');
+    $('#MainText').append('<p>');
+    for (let h = 0; h < historyList.length; h++)
+        $('#MainText').append(historyList[h] + '<br>')
+    $('#MainText').append('</p>');
+}
 
 function renderText() {
 
@@ -232,6 +225,6 @@ function addBidder() {
 }
 
 function update() {
-    $('#UpdateModal').modal('show');
+    $('#Update').modal('show');
 }
 
