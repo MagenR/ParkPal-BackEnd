@@ -2,15 +2,12 @@
 // ---------------------------------------- Constroller functions--------------------------
 
 $(document).ready(function () {
-
-    const queryString = window.location.search;
-    const urlParams = new URLSearchParams(queryString);
-    var urlParam = 'addBuyer'; // Set Default param to auction.
-    urlParam = urlParams.get('category');
-    renderText(urlParam);
-    //$('#makeAbidModal').on('click', '#MakeAbidBtn', function () {
-    //    postAuction();
-    //});
+    $('#AddSellerBtn').click(addSeller);
+    $('#AddBidderBtn').click(addBidder);
+    $('#UpdateBtn').click(update);
+    $('#AddSBtn').click(postSeller);
+    $('#AddBBtn').click(postBidder);
+    renderText();
     getAuction();
 
 });
@@ -19,8 +16,8 @@ $(document).ready(function () {
 
 // Get users list for admin use.
 function getAuction() {
-    let api = "../api/Auctions/auctioncampaigns";
-
+    let api = "../api/Auctions/auctioncampaigns"; 
+    
     ajaxCall("GET", api, "", getAuctionSuccessCB, getErrorCB);
 }
 
@@ -41,23 +38,42 @@ function getErrorCB(err) {
 // ---------------------------------------------- Post -------------------------------------------------
 
 
-function postAuction() {
+function postSeller() {
 
     let newBid = {
-        User_Name: $('#username').val(),
-        Bid: $('#currentBid').val(),
-        Max_Bid: $('#maxBid').val(),
+        UserName: $('#UserNameSeller').val(),
+        minSellingPrice: $('#minPrice').val(),
     }
 
-    let api = "../api/Auction";
-    ajaxCall("POST", api, JSON.stringify(newBid), postAuctionSuccessCB, postAuctionErrorCB);
+    let api = "../api/Auctions/postacseller";
+    ajaxCall("POST", api, JSON.stringify(newBid), postSellerSuccessCB, postSellerErrorCB);
 }
 
-function postAuctionSuccessCB(msg) {
+function postSellerSuccessCB(msg) {
     getAuction();
 }
 
-function postAuctionErrorCB(err) {
+function postSellerErrorCB(err) {
+    console.log(err.status + " " + err.responseJSON.Message);
+    swal("Error!", err.responseJSON.Message, "error");
+}
+
+function postBidder() {
+
+    let newBid = {
+        UserName: $('#UserNameBidder').val(),
+        BidLimit: $('#maxPrice').val(),
+    }
+
+    let api = "../api/Auctions/postacbidder";
+    ajaxCall("POST", api, JSON.stringify(newBid), postBidderSuccessCB, postBidderErrorCB);
+}
+
+function postBidderSuccessCB(msg) {
+    getAuction();
+}
+
+function postBidderErrorCB(err) {
     console.log(err.status + " " + err.responseJSON.Message);
     swal("Error!", err.responseJSON.Message, "error");
 }
@@ -68,8 +84,8 @@ function postAuctionErrorCB(err) {
 function renderAuction(auction) {
     renderBidders(auction.Bidders);
     renderSellers(auction.Sellers);
-/*    renderAuction(auction.auction);*/
-
+    renderLeaders(auction.Auctions);
+    renderHistory(auction.BidHistory)
 }
 
 function renderBidders(bidders) {
@@ -99,6 +115,7 @@ function renderBidders(bidders) {
                 { data: "UserName" },
                 { data: "BidLimit" }
             ],
+            "destroy": true,
         });
     }
     catch (err) {
@@ -133,6 +150,7 @@ function renderSellers(sellers) {
                 { data: "UserName" },
                 { data: "MinSellingPrice" }
             ],
+            "destroy": true,
         });
     }
     catch (err) {
@@ -140,71 +158,73 @@ function renderSellers(sellers) {
     }
 }
 
-//function renderAuction(auctions) {
+function renderLeaders(auctions) {
 
-//    $().html(
-//        '<thead>' +
-//        '<tr>' +
-//        '<th>currBid</th>' +
-//        '</tr>' +
-//        '</thead>' +
-//        '<tbody>' +
-//        '</tbody>' +
-//        '<tfoot>' +
-//        '<tr>' +
-//        '<th>currBid</th>' +
-//        '</tr>' +
-//        '</tfoot>'
-//    );
+    $().html(
+        '<thead>' +
+        '<tr>' +
+        '<th>Seller Name</th>' +
+        '<th>Highest Bidder</th>' +
+        '<th>CurrentBid</th>' +
+        '</tr>' +
+        '</thead>' +
+        '<tbody>' +
+        '</tbody>' +
+        '<tfoot>' +
+        '<tr>' +
+        '<th>Seller Name</th>' +
+        '<th>Highest Bidder</th>' +
+        '<th>CurrentBid</th>' +
+        '</tr>' +
+        '</tfoot>'
+    );
 
-//    try {
-//        tbl = $('#auctionsTable').DataTable({
-//            data: auctions,
-//            pageLength: 10,
-//            columns: [
-//                { data: "currBid" },
-//            ],
-//        });
-//    }
-//    catch (err) {
-//        alert(err);
-//    }
-//}
-
-function showModal() {
-    $('#makeAbidModal').modal('show');
+    try {
+        tbl = $('#LeadingRecords').DataTable({
+            data: auctions,
+            pageLength: 10,
+            columns: [
+                { data: "Seller.UserName" },
+                { data: "HighestBidder.UserName" },
+                { data: "CurrBid" }
+            ],
+            "destroy": true,
+        });
+    }
+    catch (err) {
+        alert(err);
+    }
 }
 
 // ---------------------------------------------- Dynamic text input ----------------------------------------------
 
-function renderText(choice) {
+function renderHistory(historyList) {
+    $('#MainText').html('');
+    $('#MainText').append('<p>');
+    for (let h = 0; h < historyList.length; h++)
+        $('#MainText').append(historyList[h] + '<br>')
+    $('#MainText').append('</p>');
+}
 
-    var MainHeading;
-    var MainText;
-    var TableName;
+function renderText() {
 
-    switch (choice) {
-        case 'addBuyer':
-            MainHeading = 'Auction Data Base';
-            MainText = 'All the bidding for this parking lot.';
-            biddersTableName = 'Bidders';
-            sellersTableName = 'Sellers';
-            auctionTableName = 'Auctions';
-            showModal();
-            break;
-        case 'auction':
-        default:
-            MainHeading = 'Auction Data Base';
-            MainText = 'All the bidding for this parking lot.';
-            biddersTableName = 'Bidders';
-            sellersTableName = 'Sellers';
-            auctionTableName = 'Auctions';
-            getAuction();
-    }
-
+    var MainHeading = 'Auction Data Base';
+    var MainText = 'All the bidding for this parking lot.';
     $('#MainHeading').html(MainHeading);
     $('#MainText').html(MainText);
-    $('#biddersTableName').html('<i class="fas fa-table me-1"></i>' + biddersTableName);
-    $('#sellersTableName').html('<i class="fas fa-table me-1"></i>' + sellersTableName);
-    $('#auctionTableName').html('<i class="fas fa-table me-1"></i>' + auctionTableName);
+ 
 }
+// ---------------------------------------------- Insert buttons ----------------------------------------------
+
+function addSeller() {
+    $('#AddSeller').modal('show');
+}
+
+function addBidder() {
+    $('#AddBidder').modal('show');
+}
+
+function update() {
+    $('#Update').modal('show');
+}
+
