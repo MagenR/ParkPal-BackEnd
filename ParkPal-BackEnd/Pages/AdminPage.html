@@ -43,19 +43,6 @@
 
     <div id="layoutSidenav">
         <div id="layoutSidenav_nav">
-            <nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
-                <div class="sb-sidenav-menu">
-                    <div class="nav">
-                        <div class="sb-sidenav-menu-heading">Tables</div>
-                        <a class="nav-link" id="getAuctionList" href="admin.html?category=auction">
-                            Auction
-                        </a>
-                        <a class="nav-link" id="addBuyer" href="admin.html?category=addBuyer">
-                            Make a bid
-                        </a>
-                    </div>
-                </div>
-            </nav>
         </div>
         <div id="layoutSidenav_content">
             <main>
@@ -70,9 +57,9 @@
                     <div class="row">
                         <div class="col">
                             <div class="card mb-4">
-                                <div class="card-header" id="biddersTableName">
+                                <div class="card-header">
                                     <i class="fas fa-table me-1"></i>
-                                    *Table Name Here*
+                                    Bidders
                                 </div>
                                 <div class="card-body">
                                     <table id="biddersTable" class="table table-striped" width="100%">
@@ -82,9 +69,9 @@
                         </div>
                         <div class="col">
                             <div class="card mb-4">
-                                <div class="card-header" id="sellersTableName">
+                                <div class="card-header">
                                     <i class="fas fa-table me-1"></i>
-                                    *Table Name Here*
+                                    Sellers
                                 </div>
                                 <div class="card-body">
                                     <table id="sellersTable" class="table table-striped" width="100%">
@@ -93,44 +80,103 @@
                             </div>
                         </div>
                     </div>
+
                     <div class="row">
+                        <div class="col">
                             <div class="card mb-4">
-                                <div class="card-header" id="auctionTableName">
+                                <div class="card-header">
                                     <i class="fas fa-table me-1"></i>
-                                    *Table Name Here*
+                                    Leading Bidders
                                 </div>
                                 <div class="card-body">
-                                    <table id="auctionsTable" class="table table-striped" width="100%">
+                                    <table id="LeadingRecords" class="table table-striped" width="100%">
                                     </table>
-                                </div>
-                        </div>
-
-                    </div>
-                    <!-- Make a Bid Modal -->
-                    <div class="modal fade" id="makeAbidModal" tabindex="-1" aria-labelledby="makeAbidModalLabel" aria-hidden="true">
-                        <div class="modal-dialog">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h4 class="modal-title" id="makeAbidModalLabel">Make a Bid</h4>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                </div>
-                                <div class="modal-body container">
-                                    <img class="img-fluid mb-3" src="" />
-                                    <h5>User name:</h5>
-                                    <input id="userName" />
-                                    <h5>Bid</h5>
-                                    <input id="bid" />
-                                    <h5>Max Bid</h5>
-                                    <input id="maxBid" />
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                    <button type="button" class="btn btn-primary" id="MakeAbidBtn">Make The Bid</button>
                                 </div>
                             </div>
                         </div>
                     </div>
-</main>
+                    <div>
+                        <button id="AddSellerBtn"> New seller</button>
+                        <button id="AddBidderBtn"> New bidder</button>
+                        <button id="UpdateBtn"> Update bidder</button>
+                    </div>
+
+                    <div class="modal fade" id="AddSeller" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="staticBackdropLabel">Add Seller</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="form-group">
+                                        <label for="firstNameTB">User Name:</label>
+                                        <input type="text" class="form-control" id="UserNameSeller" placeholder="Your user name." required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="minPrice">Min Price:</label>
+                                        <input type="number" class="form-control" id="minPrice" placeholder="Your minimum price." required>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                    <button type="button" class="btn btn-primary" id="AddSBtn">Add</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                        <div class="modal fade" id="AddBidder" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="staticBackdropLabel">Add Bidder</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="form-group">
+                                            <label for="firstNameTB">User Name:</label>
+                                            <input type="text" class="form-control" id="UserNameBidder" placeholder="Your user name." required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="minPrice">Max Price:</label>
+                                            <input type="number" class="form-control" id="maxPrice" placeholder="Your maxmimum price." required>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        <button type="button" class="btn btn-primary" id="AddBBtn">Add</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal fade" id="UpdateModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="staticBackdropLabel">Update price</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">                
+                                        <div class="form-group">
+                                            <label for="firstNameTB">User Name:</label>
+                                            <input type="text" class="form-control" id="UserNameBidderUpdate" placeholder="Your user name." required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="minPrice">New Price:</label>
+                                            <input type="number" class="form-control" id="newPrice" placeholder="Your new price." required>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        <button type="button" class="btn btn-primary" id="Update">Update</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                <!-- Make a Bid Modal -->
+            </main>
             <footer class="py-4 bg-light mt-auto">
                 <div class="container-fluid px-4">
                     <div class="d-flex align-items-center justify-content-between small">
