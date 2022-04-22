@@ -19,6 +19,7 @@ namespace ParkPal_BackEnd.Models.DAL
         public enum queryType { INSERT, UPDATE, DELETE }
         public enum LoginType { Email, Username, Password }
         public enum Period { Past, Future }
+        public enum IdSearchType { User, ParkingLot }
 
         //--------------------------------------------------------------------------------------------------
         // Create a connection to the database according to the connectionString name in the web.config.
@@ -233,17 +234,27 @@ namespace ParkPal_BackEnd.Models.DAL
         //--------------------------------------------------------------------------------------------------
         public static List<ParkingLot> GetParkingLots(double latitude, double longitude, DateTime startTime, DateTime endTime)
         {
-            string selectSTR =  "SELECT pl.id, pl.name, pl.address, pl.hourly_tariff, pl.num_of_spaces, geography::STGeomFromText(geo_location.STAsText(), 4326) as 'geo_location', COUNT(distinct reses.id) as 'number of concurrent parkings' " +
-                                "FROM ParkPal_Parking_Lots as pl LEFT JOIN " +
-                                    "(SELECT* " +
-                                    "FROM ParkPal_Parking_Arrangements " +
-                                    "WHERE @starting_time BETWEEN start_time AND end_time " +
-                                          "OR @ending_time BETWEEN start_time AND end_time " +
-                                          "OR start_time BETWEEN @starting_time AND @ending_time) as reses " +
-                                    "on pl.id = reses.parking_lot_id " +
-                                "WHERE @origin.STDistance(geo_location) <= @distance " +
-                                "GROUP BY pl.id, pl.name, pl.address, pl.hourly_tariff, pl.num_of_spaces, pl.geo_location.STAsText() " +
-                                "HAVING COUNT(distinct reses.id) < pl.num_of_spaces; ";
+            string selectSTR =
+                "SELECT pl.id, pl.name, pl.address, pl.hourly_tariff, pl.num_of_spaces, " +
+                "geography::STGeomFromText(geo_location.STAsText(), 4326) as 'geo_location', " +
+                "COUNT(distinct reses.id) as 'number of concurrent parkings', " +
+                "COUNT(distinct ppaa.arrangement_id) as 'number of auctions', " +
+                "CASE " +
+                    "WHEN COUNT(distinct reses.id) = pl.num_of_spaces and COUNT(distinct ppaa.arrangement_id) > 0 then 'auctioned' " +
+                    "WHEN COUNT(distinct reses.id) = pl.num_of_spaces then 'full' " +
+                    "Else 'empty' " +
+                "end as 'lot_type' " +
+                "FROM ParkPal_Parking_Lots as pl LEFT JOIN " +
+                    "(SELECT* " +
+                    "FROM ParkPal_Parking_Arrangements " +
+                    "WHERE @starting_time BETWEEN start_time AND end_time " +
+                            "OR @ending_time BETWEEN start_time AND end_time " +
+                            "OR start_time BETWEEN @starting_time AND @ending_time) " +
+                    "as reses on pl.id = reses.parking_lot_id " +
+                    "LEFT JOIN ParkPal_Auction_Arrangements as ppaa on reses.parking_lot_id = ppaa.arrangement_id " +
+                "WHERE @origin.STDistance(geo_location) <= @distance " +
+                "GROUP BY pl.id, pl.name, pl.address, pl.hourly_tariff, pl.num_of_spaces, pl.geo_location.STAsText() "; //+
+                //"HAVING COUNT(distinct reses.id) < pl.num_of_spaces;";
 
             SqlConnection con = Connect("DBConnectionString");
             SqlCommand cmd = new SqlCommand(selectSTR, con);
@@ -257,10 +268,10 @@ namespace ParkPal_BackEnd.Models.DAL
             cmd.Parameters["@origin"].Value = SqlGeography.STGeomFromText(
                                                 new SqlChars("POINT(" + latitude + " " + longitude + ")"), 4326);
 
-            cmd.Parameters.Add("@starting_time", SqlDbType.Date);
+            cmd.Parameters.Add("@starting_time", SqlDbType.SmallDateTime);
             cmd.Parameters["@starting_time"].Value = startTime;
 
-            cmd.Parameters.Add("@ending_time", SqlDbType.Date);
+            cmd.Parameters.Add("@ending_time", SqlDbType.SmallDateTime);
             cmd.Parameters["@ending_time"].Value = endTime;
 
             try
@@ -277,7 +288,8 @@ namespace ParkPal_BackEnd.Models.DAL
                                 (int)dr["hourly_tariff"], 
                                 (int)dr["num_of_spaces"],
                                 (double)((SqlGeography)dr["geo_location"]).Lat, 
-                                (double)((SqlGeography)dr["geo_location"]).Long
+                                (double)((SqlGeography)dr["geo_location"]).Long,
+                                (string)dr["lot_type"]
                             )
                         );
                 return parkingLots;
@@ -302,11 +314,16 @@ namespace ParkPal_BackEnd.Models.DAL
         //--------------------------------------------------------------------------------------------------
         public static List<ParkingArrangement> GetParkingArrangements(int user_id, Period datePeriod)
         {
-            string selectSTR = "SELECT * FROM ParkPal_Parking_Arrangements as pa WHERE pa.user_id = '" + user_id + "' and GetDate()";
+            string selectSTR =  "SELECT * FROM ParkPal_Parking_Arrangements " +
+                                "WHERE pa.user_id = @user_id and GetDate()";
             selectSTR += (datePeriod == Period.Past) ? " > end_time" : " < start_time ";
 
             SqlConnection con = Connect("DBConnectionString");
             SqlCommand cmd = new SqlCommand(selectSTR, con);
+
+            cmd.Parameters.Add("@user_id", SqlDbType.Int);
+            cmd.Parameters["@user_id"].Value = user_id;
+
             try
             {
                 SqlDataReader dr = cmd.ExecuteReader(CommandBehavior.CloseConnection);
@@ -341,6 +358,66 @@ namespace ParkPal_BackEnd.Models.DAL
             }
         }
 
+        //--------------------------------------------------------------------------------------------------
+        // Get list of parking arrangements for a parking lot corresponding to requested time slot.
+        //--------------------------------------------------------------------------------------------------
+        public static ParkingLot GetParkingArrangements(int parkingLotId, DateTime startTime, DateTime endTime)
+        {
+            string selectSTR =  "SELECT * FROM ParkPal_Parking_Arrangements " +
+                                "WHERE parking_lot_id = parking_lot_id " +
+                                "AND @starting_time BETWEEN start_time AND end_time " +
+                                    "OR @ending_time BETWEEN start_time AND end_time " +
+                                    "OR start_time BETWEEN @starting_time AND @ending_time;";
+
+            SqlConnection con = Connect("DBConnectionString");
+            SqlCommand cmd = new SqlCommand(selectSTR, con);
+
+            cmd.Parameters.Add("@parking_lot_id", SqlDbType.Int);
+            cmd.Parameters["@parking_lot_id"].Value = parkingLotId;
+
+            cmd.Parameters.Add("@starting_time", SqlDbType.Date);
+            cmd.Parameters["@starting_time"].Value = startTime;
+
+            cmd.Parameters.Add("@ending_time", SqlDbType.Date);
+            cmd.Parameters["@ending_time"].Value = endTime;
+
+            try
+            {
+                SqlDataReader dr = cmd.ExecuteReader(CommandBehavior.CloseConnection);
+                if (dr.HasRows == false)
+                    return null;
+                List<ParkingArrangement> parkingArrangements = new List<ParkingArrangement>();
+                while (dr.Read()) ;
+                //parkingLots.Add(new ParkingLot(
+                //            (int)dr["id"],
+                //            (string)dr["name"],
+                //            (string)dr["address"],
+                //            (int)dr["hourly_tariff"],
+                //            (int)dr["num_of_spaces"],
+                //            (double)((SqlGeography)dr["geo_location"]).Lat,
+                //            (double)((SqlGeography)dr["geo_location"]).Long
+                //        )
+                //    );
+
+                //ParkingLot pl = new ParkingLot();
+
+                //return pl;
+                return null;
+            }
+            catch (Exception ex)
+            {
+                // write to log
+                throw (ex);
+            }
+            finally
+            {
+                if (con != null)
+                {
+                    con.Close();
+                }
+
+            }
+        }
         //--------------------------------------------------------------------------------------------------
         // Update an object in the database. - Update users's given parking arrangement.
         //--------------------------------------------------------------------------------------------------

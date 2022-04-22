@@ -17,7 +17,7 @@ namespace ParkPal_BackEnd.Models
         // int numOfOccupiedSlots
         // list<int> occupiedSlots;
         double distanceFromPosition, latitude, longitude;
-        string name, address;
+        string name, address, type;
         List<ParkingSpot> spots;
 
         //--------------------------------------------------------------------------------------------------
@@ -33,32 +33,34 @@ namespace ParkPal_BackEnd.Models
         public List<ParkingSpot> Spots { get => spots; set => spots = value; }
         public double Latitude { get => latitude; set => latitude = value; }
         public double Longitude { get => longitude; set => longitude = value; }
+        public string Type { get => type; set => type = value; }
 
         //--------------------------------------------------------------------------------------------------
         // Constructors
         //--------------------------------------------------------------------------------------------------
 
         // Full constructor
-        public ParkingLot(int id, string name, string address, int hourlyTariff, int numOfSpaces, double latitude, double longitude, List<ParkingSpot> spots) : this(id, name, address, hourlyTariff, numOfSpaces, latitude, longitude)
+        public ParkingLot(int id, string name, string address, int hourlyTariff, int numOfSpaces, double latitude, double longitude, List<ParkingSpot> spots, string type) : this(id, name, address, hourlyTariff, numOfSpaces, latitude, longitude, type)
         {
             Spots = spots;
         }
 
         // For Get
-        public ParkingLot(int id, string name, string address, int hourlyTariff, int numOfSpaces, double latitude, double longitude) : this(name, address, hourlyTariff, numOfSpaces, latitude, longitude)
+        public ParkingLot(int id, string name, string address, int hourlyTariff, int numOfSpaces, double latitude, double longitude, string type) : this(name, address, hourlyTariff, numOfSpaces, latitude, longitude, type)
         {
             Id = id;
         }
 
         // For Post
-        public ParkingLot(string name, string address, int hourlyTariff, int numOfSpaces, double latitude, double longitude)
+        public ParkingLot(string name, string address, int hourlyTariff, int numOfSpaces, double latitude, double longitude, string type)
         {
             HourlyTariff = hourlyTariff;
             NumOfSpaces = numOfSpaces;
             Name = name;
             Address = address;
             Latitude = latitude;
-            Longitude = longitude;           
+            Longitude = longitude;
+            Type = type;
         }
 
         // For parking arrangements

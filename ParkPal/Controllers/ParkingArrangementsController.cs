@@ -16,7 +16,7 @@ namespace ParkPal_BackEnd.Controllers
         //--------------------------------------------------------------------------------------------------
 
         // GET request - Returns list of parking arrangments from (history/future schedule).
-        private IHttpActionResult Get(int user_id, DataServices.Period period)
+        private IHttpActionResult Get(int user_id, DataServices.IdSearchType idType, DataServices.Period period)
         {
             try
             {
@@ -36,7 +36,7 @@ namespace ParkPal_BackEnd.Controllers
         [Route("api/getPastReservations")]
         public IHttpActionResult GetPastReservations(int user_id)
         {
-            return Get(user_id, DataServices.Period.Past);
+            return Get(user_id, DataServices.IdSearchType.User, DataServices.Period.Past);
         }
 
         // GET request - Returns list of parking arrangments, future schedule.
@@ -44,7 +44,12 @@ namespace ParkPal_BackEnd.Controllers
         [Route("api/getFutureReservations")]
         public IHttpActionResult GetFutureReservations(int user_id)
         {
-            return Get(user_id, DataServices.Period.Future);
+            return Get(user_id, DataServices.IdSearchType.User, DataServices.Period.Future);
+        }
+
+        public IHttpActionResult GetFreeSlots(int parkingLot_id)
+        {
+            return Get(parkingLot_id, DataServices.IdSearchType.ParkingLot, DataServices.Period.Future);
         }
 
         //--------------------------------------------------------------------------------------------------
