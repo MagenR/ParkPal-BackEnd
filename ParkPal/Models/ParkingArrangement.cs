@@ -60,9 +60,9 @@ namespace ParkPal_BackEnd.Models
         //--------------------------------------------------------------------------------------------------
 
         // Returns the list of parking arrangements for given user and time period.
-        public static List<ParkingArrangement> Get(int buyer_id, DataServices.Period datePeriod)
+        public static List<ParkingArrangement> Get(int searcher_id, DataServices.Period datePeriod)
         {
-            return DataServices.GetParkingArrangements(buyer_id, datePeriod);
+            return DataServices.GetParkingArrangements(searcher_id, datePeriod);
         }
 
     }
