@@ -76,10 +76,9 @@ namespace ParkPal_BackEnd.Models.DAL
 
                 cmd.Parameters.Add("@hourly_tariff", SqlDbType.Int);
                 cmd.Parameters["@hourly_tariff"].Value = pl.HourlyTariff;
-                
-                cmd.Parameters.AddWithValue("@num_of_spaces", SqlGeography.STGeomFromText(
-                                                new SqlChars("POINT(" + pl.Latitude + " " + pl.Longitude + ")"), 4326));
-                
+
+                cmd.Parameters.AddWithValue("@num_of_spaces", SqlGeography.Point(pl.Latitude, pl.Longitude, ParkingLot.SRID));
+
                 cmd.Parameters["@num_of_spaces"].Value = pl.NumOfSpaces;
             }
 
@@ -263,10 +262,8 @@ namespace ParkPal_BackEnd.Models.DAL
             cmd.Parameters["@distance"].Value = ParkingLot.searchRadius;
 
             cmd.Parameters.Add("@origin", SqlDbType.Udt);
-            cmd.Parameters["@origin"].UdtTypeName = "geography";           
-            //cmd.Parameters["@origin"].Value = SqlGeography.Parse(geoLocation.AsText()).MakeValid();        
-            cmd.Parameters["@origin"].Value = SqlGeography.STGeomFromText(
-                                                new SqlChars("POINT(" + latitude + " " + longitude + ")"), 4326);
+            cmd.Parameters["@origin"].UdtTypeName = "geography";
+            cmd.Parameters["@origin"].Value = SqlGeography.Point(latitude, longitude, ParkingLot.SRID);
 
             cmd.Parameters.Add("@starting_time", SqlDbType.SmallDateTime);
             cmd.Parameters["@starting_time"].Value = startTime;

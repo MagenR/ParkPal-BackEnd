@@ -12,6 +12,7 @@ namespace ParkPal_BackEnd.Models
         // Fields
         //--------------------------------------------------------------------------------------------------
         public const int searchRadius = 3000; // search within this radius.
+        public const int SRID = 4326;
 
         int id, hourlyTariff, numOfSpaces;
         // int numOfOccupiedSlots
