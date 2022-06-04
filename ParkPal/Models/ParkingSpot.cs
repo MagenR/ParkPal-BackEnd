@@ -27,7 +27,8 @@ namespace ParkPal_BackEnd.Models
         //--------------------------------------------------------------------------------------------------
         // Constructors
         //--------------------------------------------------------------------------------------------------
-
+        
+        // Full constructor
         public ParkingSpot(int Number, ParkingLot parentlot, List<ParkingArrangement> arrangements)
         {
             number = Number;
@@ -35,10 +36,11 @@ namespace ParkPal_BackEnd.Models
             Arrangements = arrangements;
         }
 
+        public ParkingSpot() { }
+
         //--------------------------------------------------------------------------------------------------
         // Methods 
         //--------------------------------------------------------------------------------------------------
-
 
     }
 }

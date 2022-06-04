@@ -32,28 +32,16 @@ namespace ParkPal_BackEnd.Models
         //--------------------------------------------------------------------------------------------------
 
         // Full constructor
-        public ParkingArrangement(int id, AppUser buyer, ParkingSpot parentSpot, DateTime startTime, DateTime endTime) : this( buyer,  startTime,  endTime)
-        {
+        public ParkingArrangement(AppUser buyer, ParkingSpot parentSpot, DateTime startTime, DateTime endTime)
+        { 
             Id = id;
-            EndTime = endTime;
-            ParentSpot = parentSpot;
-        }
-
-        // For parking lots.
-        public ParkingArrangement(AppUser buyer, DateTime startTime, DateTime endTime)
-        {
             Buyer = buyer;
-            StartTime = startTime;
-            EndTime = endTime;
-        }
-
-        // For users.
-        public ParkingArrangement(ParkingSpot parentSpot, DateTime startTime, DateTime endTime)
-        {
             ParentSpot = parentSpot;
             StartTime = startTime;
             EndTime = endTime;
         }
+
+        public ParkingArrangement() { }
 
         //--------------------------------------------------------------------------------------------------
         // Methods 
@@ -63,6 +51,12 @@ namespace ParkPal_BackEnd.Models
         public static List<ParkingArrangement> Get(int searcher_id, DataServices.Period datePeriod)
         {
             return DataServices.GetParkingArrangements(searcher_id, datePeriod);
+        }
+
+        // Returns a vacant slot number to be used in the parking arrangemnt reservation.
+        public void findVacantSpot()
+        {
+            ParentSpot.Number = DataServices.GetVacantSlotsList(this);
         }
 
     }

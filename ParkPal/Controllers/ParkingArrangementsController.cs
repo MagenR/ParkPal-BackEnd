@@ -9,6 +9,7 @@ using ParkPal_BackEnd.Models.DAL;
 
 namespace ParkPal_BackEnd.Controllers
 {
+    [RoutePrefix("api/parkingarrangements")]
     public class ParkingArrangementsController : ApiController
     {
         //--------------------------------------------------------------------------------------------------
@@ -57,13 +58,19 @@ namespace ParkPal_BackEnd.Controllers
         //--------------------------------------------------------------------------------------------------
 
         // POST request - Inserts a parking arrangement into the DB.
+        [HttpPost]
+        [Route("reserve")]
         public IHttpActionResult Post([FromBody] ParkingArrangement pa)
         {
+            if (pa == null)
+                return BadRequest();
             try
             {
-                if (pa.Insert() == 0)
+                pa.findVacantSpot();
+                //if (pa.ParentSpot.Number == 0 || pa.Insert() == 0)
+                if (pa.ParentSpot.Number == 0)
                     return Content(HttpStatusCode.Conflict, "Error. Could not reserve parking.");
-                return Ok("Parking reserved succesfully!");
+                return Ok(pa.ParentSpot.Number);
             }
             catch (Exception ex)
             {
