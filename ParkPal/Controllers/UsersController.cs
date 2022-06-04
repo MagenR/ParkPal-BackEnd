@@ -75,6 +75,8 @@ namespace ParkPal_BackEnd.Controllers
         [Route("signup")]
         public IHttpActionResult Post([FromBody] AppUser u)
         {
+            if (u == null)
+                return BadRequest();
             try
             {
                 if (u.Insert() == 0)

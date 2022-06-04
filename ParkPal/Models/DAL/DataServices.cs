@@ -372,10 +372,10 @@ namespace ParkPal_BackEnd.Models.DAL
             cmd.Parameters.Add("@parking_lot_id", SqlDbType.Int);
             cmd.Parameters["@parking_lot_id"].Value = parkingLotId;
 
-            cmd.Parameters.Add("@starting_time", SqlDbType.Date);
+            cmd.Parameters.Add("@starting_time", SqlDbType.SmallDateTime);
             cmd.Parameters["@starting_time"].Value = startTime;
 
-            cmd.Parameters.Add("@ending_time", SqlDbType.Date);
+            cmd.Parameters.Add("@ending_time", SqlDbType.SmallDateTime);
             cmd.Parameters["@ending_time"].Value = endTime;
 
             try
@@ -414,6 +414,65 @@ namespace ParkPal_BackEnd.Models.DAL
                 }
 
             }
+        }
+
+        //--------------------------------------------------------------------------------------------------
+        // Get list of reserved spot numbers for a parking lot corresponding to requested time slot.
+        //--------------------------------------------------------------------------------------------------
+        public static int GetVacantSlotsList(ParkingArrangement pa)
+        {
+            string selectSTR =  "select distinct(parking_spot_number) " +
+                                "from ParkPal_Parking_Arrangements " +
+                                "where parking_lot_id = @parent_lot and " +
+                                        "(@starting_time between start_time and end_time " +
+                                        "or @ending_time between start_time and end_time " +
+                                        "or start_time between @starting_time and @ending_time) " +
+                                "order by parking_spot_number;";
+
+            SqlConnection con = Connect("DBConnectionString");
+            SqlCommand cmd = new SqlCommand(selectSTR, con);
+
+            cmd.Parameters.Add("@parent_lot", SqlDbType.Int);
+            cmd.Parameters["@parent_lot"].Value = pa.ParentSpot.ParentLot.Id;
+
+            cmd.Parameters.Add("@starting_time", SqlDbType.SmallDateTime);
+            cmd.Parameters["@starting_time"].Value = pa.StartTime;
+
+            cmd.Parameters.Add("@ending_time", SqlDbType.SmallDateTime);
+            cmd.Parameters["@ending_time"].Value = pa.EndTime;
+
+            try
+            {
+                SqlDataReader dr = cmd.ExecuteReader(CommandBehavior.CloseConnection);
+                if (dr.HasRows == false)
+                    return 1; // if parking lot is completely vacant - first slot is a good choice.
+
+                List<int> nonVacantSlots = new List<int>();
+
+                while (dr.Read()) // Build the list of non vacant slots/
+                    nonVacantSlots.Add((int)dr["parking_spot_number"]);
+
+                // if slot is in list, then it's not vacant
+                for (int i = 1; i <= pa.ParentSpot.ParentLot.NumOfSpaces; i++)
+                    if (!nonVacantSlots.Contains(i))
+                        return i;
+
+                return 0; // all slots are filled.
+            }
+            catch (Exception ex)
+            {
+                // write to log
+                throw (ex);
+            }
+            finally
+            {
+                if (con != null)
+                {
+                    con.Close();
+                }
+
+            }
+
         }
         //--------------------------------------------------------------------------------------------------
         // Update an object in the database. - Update users's given parking arrangement.
