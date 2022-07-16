@@ -335,8 +335,9 @@ namespace ParkPal_BackEnd.Models.DAL
         //--------------------------------------------------------------------------------------------------
         public static List<ParkingArrangement> GetParkingArrangements(int user_id, Period datePeriod)
         {
-            string selectSTR =  "SELECT * " +
+            string selectSTR =  "SELECT *, pl.name " +
                                 "FROM ParkPal_Parking_Arrangements as pa " +
+                                    "join ParkPal_Parking_Lots as pl on pl.id = pa.parking_lot_id " +
                                 "WHERE pa.user_id = @user_id and GetDate()";
             selectSTR += (datePeriod == Period.Past) ? " > pa.end_time" : " < pa.start_time ";
 
@@ -359,8 +360,7 @@ namespace ParkPal_BackEnd.Models.DAL
                         (int)dr["id"],
                         new ParkingSpot((int)dr["parking_spot_number"],
                                         new ParkingLot( (int)dr["parking_lot_id"],
-                                                        (string)dr["@name"],
-                                                        (string)dr["@address"]
+                                                        (string)dr["name"]
                                                        )
                                         ),
                         (DateTime)dr["start_time"],
@@ -456,7 +456,8 @@ namespace ParkPal_BackEnd.Models.DAL
         //--------------------------------------------------------------------------------------------------
         public static ParkingLot GetParkingArrangements(int parkingLotId, DateTime startTime, DateTime endTime)
         {
-            string selectSTR =  "SELECT * FROM ParkPal_Parking_Arrangements " +
+            string selectSTR =  "SELECT * " +
+                                "FROM ParkPal_Parking_Arrangements " +
                                 "WHERE parking_lot_id = parking_lot_id " +
                                 "AND @starting_time BETWEEN start_time AND end_time " +
                                     "OR @ending_time BETWEEN start_time AND end_time " +

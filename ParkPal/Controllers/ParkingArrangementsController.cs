@@ -23,12 +23,12 @@ namespace ParkPal_BackEnd.Controllers
             {
                 List<ParkingArrangement> pas = ParkingArrangement.Get(user_id, period);
                 if (pas == null)
-                    return Content(HttpStatusCode.Conflict, "Error. Login failed. no such user exists.");
+                    return Content(HttpStatusCode.Conflict, "Reservation DB is empty for this user.\n");
                 return Ok(pas);
             }
             catch (Exception ex)
             {
-                return Content(HttpStatusCode.Conflict, "Error. Could not login.\n" + ex.Message);
+                return Content(HttpStatusCode.Conflict, "Error. Could not generate reservations list.\n" + ex.Message);
             }
         }
 

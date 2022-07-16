@@ -65,11 +65,10 @@ namespace ParkPal_BackEnd.Models
         }
 
         // For parking arrangements
-        public ParkingLot(int id, string name, string address)
+        public ParkingLot(int id, string name)
         {
             Id = id;
             Name = name;
-            Address = address;
         }
 
         public ParkingLot() { }
