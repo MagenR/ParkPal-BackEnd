@@ -16,7 +16,7 @@ namespace ParkPal_BackEnd.Models.DAL
         //--------------------------------------------------------------------------------------------------
         // Custom Data types.
         //--------------------------------------------------------------------------------------------------
-        public enum queryType { INSERT, UPDATE, DELETE }
+        public enum queryType { INSERT, INSERTwReturn, UPDATE, DELETE }
         public enum LoginType { Email, Username, Password }
         public enum Period { Past, Future }
         public enum IdSearchType { User, ParkingLot }
@@ -77,15 +77,17 @@ namespace ParkPal_BackEnd.Models.DAL
                 cmd.Parameters.Add("@hourly_tariff", SqlDbType.Int);
                 cmd.Parameters["@hourly_tariff"].Value = pl.HourlyTariff;
 
-                cmd.Parameters.AddWithValue("@num_of_spaces", SqlGeography.Point(pl.Latitude, pl.Longitude, ParkingLot.SRID));
-
+                cmd.Parameters.Add("@num_of_spaces", SqlDbType.Int);
                 cmd.Parameters["@num_of_spaces"].Value = pl.NumOfSpaces;
+
+                cmd.Parameters.AddWithValue("@geo_location", SqlGeography.Point(pl.Latitude, pl.Longitude, ParkingLot.SRID));         
             }
 
             else if (o is ParkingArrangement)
             {
                 ParkingArrangement pa = (ParkingArrangement)o;
-                commandText += "ParkPal_Parking_Arrangements values(@user_id, @parking_lot_id, @parking_spot_number, @start_time, @end_time) ";
+                commandText +=  "ParkPal_Parking_Arrangements values(@user_id, @parking_lot_id, @parking_spot_number, @start_time, @end_time) " +
+                                "OUTPUT Inserted.Id";
                 cmd.CommandText = commandText;
 
                 cmd.Parameters.Add("@user_id", SqlDbType.Int);
@@ -104,6 +106,24 @@ namespace ParkPal_BackEnd.Models.DAL
                 cmd.Parameters["@end_time"].Value = pa.EndTime;
             }
 
+            else if (o is Auction)
+            {
+                Auction a = (Auction)o;
+                commandText += "ParkPal_Auction_Arrangements values(@arrangement_id, @starting_price)";
+
+                cmd.CommandText = commandText;
+
+                cmd.Parameters.Add("@arrangement_id", SqlDbType.Int);
+                cmd.Parameters["@arrangement_id"].Value = a.SoldArrangement.Id;
+
+                cmd.Parameters.Add("@starting_price", SqlDbType.Int);
+                cmd.Parameters["@starting_price"].Value = a.StartingPrice;
+            }
+
+            //else if (o is Bid)
+            //{
+
+            //}
         }
 
         //--------------------------------------------------------------------------------------------------
@@ -130,7 +150,7 @@ namespace ParkPal_BackEnd.Models.DAL
 
         //--------------------------------------------------------------------------------------------------
         // Run an SQL querry.
-        //--------------------------------------------------------------------------------------------------       
+        //--------------------------------------------------------------------------------------------------
         public static int ExecuteSQL(object o, queryType rtype)
         {
             SqlConnection con;
@@ -147,6 +167,7 @@ namespace ParkPal_BackEnd.Models.DAL
             switch (rtype)
             {
                 case queryType.INSERT:
+                case queryType.INSERTwReturn:
                     BuildInsertCommand(cmd, o); // Append fields to insert command.
                     break;
                 case queryType.UPDATE:
@@ -155,10 +176,13 @@ namespace ParkPal_BackEnd.Models.DAL
                 case queryType.DELETE: break;
                 default: break;
             }
-            try
+
+            try // execute the command.
             {
-                int numEffected = cmd.ExecuteNonQuery(); // execute the command
-                return numEffected;
+                if(rtype is queryType.INSERTwReturn) // Parking arragnement id sometimes is needed for auction registration.
+                    return (int)cmd.ExecuteScalar();
+                else
+                    return cmd.ExecuteNonQuery();
             }
             catch (SqlException sx)
             {
@@ -311,9 +335,10 @@ namespace ParkPal_BackEnd.Models.DAL
         //--------------------------------------------------------------------------------------------------
         public static List<ParkingArrangement> GetParkingArrangements(int user_id, Period datePeriod)
         {
-            string selectSTR =  "SELECT * FROM ParkPal_Parking_Arrangements " +
+            string selectSTR =  "SELECT * " +
+                                "FROM ParkPal_Parking_Arrangements as pa " +
                                 "WHERE pa.user_id = @user_id and GetDate()";
-            selectSTR += (datePeriod == Period.Past) ? " > end_time" : " < start_time ";
+            selectSTR += (datePeriod == Period.Past) ? " > pa.end_time" : " < pa.start_time ";
 
             SqlConnection con = Connect("DBConnectionString");
             SqlCommand cmd = new SqlCommand(selectSTR, con);
@@ -327,15 +352,19 @@ namespace ParkPal_BackEnd.Models.DAL
                 if (dr.HasRows == false)
                     return null;
                 List<ParkingArrangement> parkingArrangements = new List<ParkingArrangement>();
-                List<ParkingLot> parkingLots = new List<ParkingLot>();
+                //List<ParkingLot> parkingLots = new List<ParkingLot>();
                 while (dr.Read())
                 {
-                    //parkingArrangements.Add(new ParkingArrangement(
-                    //    new ParkingLot((int)dr["parking_lot_id"], 
-                    //    (string)dr["@name"], 
-                    //    (string)dr["@address"]), 
-                    //    (DateTime)dr["start_time"], 
-                    //    (DateTime)dr["end_time"]));
+                    parkingArrangements.Add(new ParkingArrangement(
+                        (int)dr["id"],
+                        new ParkingSpot((int)dr["parking_spot_number"],
+                                        new ParkingLot( (int)dr["parking_lot_id"],
+                                                        (string)dr["@name"],
+                                                        (string)dr["@address"]
+                                                       )
+                                        ),
+                        (DateTime)dr["start_time"],
+                        (DateTime)dr["end_time"]));
                 }
                 return parkingArrangements;
 
@@ -356,7 +385,74 @@ namespace ParkPal_BackEnd.Models.DAL
         }
 
         //--------------------------------------------------------------------------------------------------
-        // Get list of parking arrangements for a parking lot corresponding to requested time slot.
+        // Get list of parking arrangements auctions for a parking lot corresponding to requested time slot. - WIP
+        //--------------------------------------------------------------------------------------------------
+        public static List<Auction> GetParkingArrangementsAuctions(int parkingLotId, DateTime startTime, DateTime endTime)
+        {
+            string selectSTR = "select * " +
+                                "from ParkPal_Auction_Arrangements as ppaa join " +
+                                     "ParkPal_Parking_Arrangements as pppa on " +
+                                     "pppa.id = ppaa.arrangement_id " +
+                                "where parking_lot_id = @parking_lot_id and" +
+                                      "start_time = @starting_time and " +
+                                      "end_time = @ending_time;";
+
+            SqlConnection con = Connect("DBConnectionString");
+            SqlCommand cmd = new SqlCommand(selectSTR, con);
+
+            cmd.Parameters.Add("@parking_lot_id", SqlDbType.Int);
+            cmd.Parameters["@parking_lot_id"].Value = parkingLotId;
+
+            cmd.Parameters.Add("@starting_time", SqlDbType.SmallDateTime);
+            cmd.Parameters["@starting_time"].Value = startTime;
+
+            cmd.Parameters.Add("@ending_time", SqlDbType.SmallDateTime);
+            cmd.Parameters["@ending_time"].Value = endTime;
+
+            try
+            {
+                SqlDataReader dr = cmd.ExecuteReader(CommandBehavior.CloseConnection);
+                if (dr.HasRows == false)
+                    return null;
+                List<Auction> auctions = new List<Auction>();
+                while (dr.Read())
+                {
+                    Auction auction = new Auction();
+                    if((int?)dr["leader_id"] != null)
+                    {
+                        auction.HighestBidder = new Bidder();
+                        auction.HighestBidder.Id = (int)dr["leader_id"];
+                    }
+                    auction.SoldArrangement = new ParkingArrangement();
+                    auction.SoldArrangement.Buyer = new AppUser();
+                    auction.SoldArrangement.Buyer.Id = (int)dr["user_id"];
+                    auction.SoldArrangement.ParentSpot = new ParkingSpot();
+                    auction.SoldArrangement.ParentSpot.Number = (int)dr["parking_spot_number"];
+                    // auction.SoldArrangement.ParentSpot.ParentLot = new ParkingLot(); 
+                    auction.StartingPrice = (int)dr["starting_price"];
+                    auction.CurrBid = (int?)dr["current_bid"];
+                    auctions.Add(auction);
+                }
+                return auctions;
+            }
+            catch (Exception ex)
+            {
+                // write to log
+                throw (ex);
+            }
+            finally
+            {
+                if (con != null)
+                {
+                    con.Close();
+                }
+
+            }
+
+        }
+
+        //--------------------------------------------------------------------------------------------------
+        // Unused - Get list of parking arrangements for a parking lot corresponding to requested time slot.
         //--------------------------------------------------------------------------------------------------
         public static ParkingLot GetParkingArrangements(int parkingLotId, DateTime startTime, DateTime endTime)
         {
@@ -417,9 +513,9 @@ namespace ParkPal_BackEnd.Models.DAL
         }
 
         //--------------------------------------------------------------------------------------------------
-        // Get list of reserved spot numbers for a parking lot corresponding to requested time slot.
+        // Get spot number available for reservation for a parking lot corresponding to requested time slot.
         //--------------------------------------------------------------------------------------------------
-        public static int GetVacantSlotsList(ParkingArrangement pa)
+        public static int GetVacantSlot(ParkingArrangement pa)
         {
             string selectSTR =  "select distinct(parking_spot_number) " +
                                 "from ParkPal_Parking_Arrangements " +
@@ -474,6 +570,7 @@ namespace ParkPal_BackEnd.Models.DAL
             }
 
         }
+
         //--------------------------------------------------------------------------------------------------
         // Update an object in the database. - Update users's given parking arrangement.
         //--------------------------------------------------------------------------------------------------

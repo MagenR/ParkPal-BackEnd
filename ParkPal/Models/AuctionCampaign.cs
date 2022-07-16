@@ -15,8 +15,6 @@ namespace ParkPal_BackEnd.Models
 
         List<Auction> auctions;
         List<Bidder> bidders;
-        List<Seller> sellers;
-        List<string> bidHistory;
 
         // ----------------------------------------------------------------------------------------
         // Props
@@ -24,34 +22,12 @@ namespace ParkPal_BackEnd.Models
 
         public List<Auction> Auctions { get => auctions; set => auctions = value; }
         public List<Bidder> Bidders { get => bidders; set => bidders = value; }
-        public List<Seller> Sellers { get => sellers; set => sellers = value; }
-        public List<string> BidHistory { get => bidHistory; set => bidHistory = value; }
 
         // ----------------------------------------------------------------------------------------
         // Constructors
         // ----------------------------------------------------------------------------------------
 
-        //public AuctionCampaign(List<Auction> auctions, List<Bidder> bidders, List<Seller> sellers)
-        //{
-        //    Auctions = auctions;
-        //    Bidders = bidders;
-        //    Sellers = sellers;
-        //}
-
-        public AuctionCampaign(List<Bidder> bidders, List<Seller> sellers)
-        {
-            Bidders = bidders;
-            Sellers = sellers;
-            BidHistory = new List<string>();
-            Auctions = initAuctions(sellers);         
-        }
-
-        //public AuctionCampaign(List<Seller> sellers) 
-        //{
-        //    Auctions = initAuctions(sellers);
-        //}
-
-        //public AuctionCampaign() { }
+        public AuctionCampaign() { }
 
         // ----------------------------------------------------------------------------------------
         // Methods
@@ -62,26 +38,15 @@ namespace ParkPal_BackEnd.Models
             autoBid(Auctions, Bidders);
         }
 
-        // Reinit after bidder and seller insert.
-        public int reInit()
+        // Initialize auctions for this campaign with given seller.
+        public List<Auction> GetAuctions(int parkingLotId, DateTime startTime, DateTime endTime)
         {
-            BidHistory.Clear();
-            Auctions = initAuctions(Sellers); 
-            return 1;
+            return DataServices.GetParkingArrangementsAuctions(parkingLotId, startTime, endTime);
         }
 
-        // Initialize auctions for this campaign with given seller.
-        public List<Auction> initAuctions(List<Seller> sellers)
+        public List<Auction> GetBidders(int parkingLotId, DateTime startTime, DateTime endTime)
         {
-            List<Auction> auctions = new List<Auction>();
-            foreach (Seller seller in sellers)
-            {
-                auctions.Add(new Auction(seller.MinSellingPrice, seller));
-                string h = seller.UserName + "'s auction was initialized with starting price: " + seller.MinSellingPrice;
-                BidHistory.Add(h);
-            }
-               
-            return auctions;
+            
         }
 
         // Place a bid on a given auction.

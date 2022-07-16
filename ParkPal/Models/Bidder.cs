@@ -11,7 +11,8 @@ namespace ParkPal_BackEnd.Models
         // ----------------------------------------------------------------------------------------
 
         int bidLimit;
-        int currentBid;
+        int? currentBid;
+        DateTime bidTime;
         Auction currentLead;
 
         // ----------------------------------------------------------------------------------------
@@ -19,7 +20,7 @@ namespace ParkPal_BackEnd.Models
         // ----------------------------------------------------------------------------------------
 
         public int BidLimit { get => bidLimit; set => bidLimit = value; }
-        public int CurrentBid { get => currentBid; set => currentBid = value; }
+        public int? CurrentBid { get => currentBid; set => currentBid = value; }
         public Auction CurrentLead { get => currentLead; set => currentLead = value; }
 
         // ----------------------------------------------------------------------------------------
@@ -30,6 +31,8 @@ namespace ParkPal_BackEnd.Models
         {
             BidLimit = bidLimit;
         }
+
+        public Bidder() { }
 
         // ----------------------------------------------------------------------------------------
         // Methods

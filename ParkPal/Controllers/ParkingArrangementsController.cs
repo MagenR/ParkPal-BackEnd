@@ -16,7 +16,7 @@ namespace ParkPal_BackEnd.Controllers
         // GET
         //--------------------------------------------------------------------------------------------------
 
-        // GET request - Returns list of parking arrangments from (history/future schedule).
+        // Returns list of parking arrangments from (history/future schedule).
         private IHttpActionResult Get(int user_id, DataServices.IdSearchType idType, DataServices.Period period)
         {
             try
@@ -32,17 +32,17 @@ namespace ParkPal_BackEnd.Controllers
             }
         }
 
-        // GET request - Returns list of parking arrangments, history.
+        // Returns list of parking arrangments, history.
         [HttpGet]
-        [Route("api/getPastReservations")]
+        [Route("getPastReservations")]
         public IHttpActionResult GetPastReservations(int user_id)
         {
             return Get(user_id, DataServices.IdSearchType.User, DataServices.Period.Past);
         }
 
-        // GET request - Returns list of parking arrangments, future schedule.
+        // Returns list of parking arrangments, future schedule.
         [HttpGet]
-        [Route("api/getFutureReservations")]
+        [Route("getFutureReservations")]
         public IHttpActionResult GetFutureReservations(int user_id)
         {
             return Get(user_id, DataServices.IdSearchType.User, DataServices.Period.Future);
@@ -57,7 +57,7 @@ namespace ParkPal_BackEnd.Controllers
         // POST
         //--------------------------------------------------------------------------------------------------
 
-        // POST request - Inserts a parking arrangement into the DB.
+        // Inserts a parking arrangement into the DB.
         [HttpPost]
         [Route("reserve")]
         public IHttpActionResult Post([FromBody] ParkingArrangement pa)
@@ -66,9 +66,7 @@ namespace ParkPal_BackEnd.Controllers
                 return BadRequest();
             try
             {
-                pa.findVacantSpot();
-                //if (pa.ParentSpot.Number == 0 || pa.Insert() == 0)
-                if (pa.ParentSpot.Number == 0)
+                if (pa.Insert() == 0)
                     return Content(HttpStatusCode.Conflict, "Error. Could not reserve parking.");
                 return Ok(pa.ParentSpot.Number);
             }
@@ -82,14 +80,24 @@ namespace ParkPal_BackEnd.Controllers
         // PUT
         //--------------------------------------------------------------------------------------------------
 
+        // Optional - Update parking arrangemnt reservation details.
+
         // PUT api/<controller>/5
         public void Put(int id, [FromBody] string value)
         {
         }
 
+        //--------------------------------------------------------------------------------------------------
+        // DELETE
+        //--------------------------------------------------------------------------------------------------
+
+        // Delete parking arrangemnt reservation.
+
         // DELETE api/<controller>/5
         public void Delete(int id)
         {
         }
+
     }
+
 }
