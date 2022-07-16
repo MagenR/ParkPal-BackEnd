@@ -83,7 +83,6 @@ namespace ParkPal_BackEnd.Models
         {
             List<ParkingLot> pls = DataServices.GetParkingLots(latitude, longitude, startTime, endTime);
             return pls;
-
         }
 
     }

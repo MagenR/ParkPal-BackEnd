@@ -35,7 +35,7 @@ namespace ParkPal_BackEnd.Controllers
 
         // GET request - Returns a list of parking lots within a default radius from a pair of coordinates.
         [HttpGet]
-        [Route("SearchByCoordinatesAndTimeSlot")] 
+        [Route("SearchByCoordinatesAndTimeSlot")]
         public IHttpActionResult Get(double latitude, double longitude, DateTime startTime, DateTime endTime)
         {
             try

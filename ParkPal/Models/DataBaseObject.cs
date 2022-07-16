@@ -14,16 +14,17 @@ namespace ParkPal_BackEnd.Models
         //--------------------------------------------------------------------------------------------------
 
         // Inserts itself to the database.
-        public int Insert()
+        public virtual int Insert()
         {
             return DataServices.Insert(this);
         }
 
         // Updates it's info
-        public int Update()
+        public virtual int Update()
         {
             return DataServices.Update(this);
         }
 
     }
+
 }

@@ -28,12 +28,11 @@ namespace ParkPal_BackEnd.Models
         // Constructors
         //--------------------------------------------------------------------------------------------------
         
-        // Full constructor
-        public ParkingSpot(int Number, ParkingLot parentlot, List<ParkingArrangement> arrangements)
+        // for user's GETs
+        public ParkingSpot(int Number, ParkingLot parentlot)
         {
             number = Number;
             ParentLot = parentlot;
-            Arrangements = arrangements;
         }
 
         public ParkingSpot() { }
