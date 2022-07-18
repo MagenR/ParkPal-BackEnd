@@ -165,6 +165,7 @@
     <Compile Include="Areas\HelpPage\SampleGeneration\TextSample.cs" />
     <Compile Include="Areas\HelpPage\XmlDocumentationProvider.cs" />
     <Compile Include="Controllers\AuctionsController.cs" />
+    <Compile Include="Controllers\BiddersController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ParkingArrangementsController.cs" />
     <Compile Include="Controllers\ParkingLotsController.cs" />

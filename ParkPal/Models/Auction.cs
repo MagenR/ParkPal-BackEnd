@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ParkPal_BackEnd.Models.DAL;
 
 namespace ParkPal_BackEnd.Models
 {
@@ -32,6 +33,14 @@ namespace ParkPal_BackEnd.Models
         // Constructors
         // ----------------------------------------------------------------------------------------
        
+        public Auction(Bidder highestBidder, ParkingArrangement soldArrangement, int startingPrice, int? currBid)
+        {
+            HighestBidder = highestBidder;
+            SoldArrangement = soldArrangement;
+            StartingPrice = startingPrice;
+            CurrBid = currBid;
+        }
+
         public Auction() { }
 
         //--------------------------------------------------------------------------------------------------
@@ -45,6 +54,12 @@ namespace ParkPal_BackEnd.Models
             if (soldArrangement.Id == 0)
                 throw new Exception("Could not insert the arrangement to the DB.");
             return base.Insert();
+        }
+
+        // Get all auctions for a given time period.
+        public static List<Auction> Get(int parkingLotId, DateTime startTime, DateTime endTime)
+        {
+            return DataServices.GetParkingArrangementsAuctions(parkingLotId, startTime, endTime);
         }
 
     } // End of class - Auction.

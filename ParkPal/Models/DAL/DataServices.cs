@@ -8,6 +8,7 @@ using System.Data.SqlClient;
 using System.Data.SqlTypes;
 using Microsoft.SqlServer.Types;
 using System.Text;
+using Antlr.Runtime.Misc;
 
 namespace ParkPal_BackEnd.Models.DAL
 {
@@ -52,7 +53,33 @@ namespace ParkPal_BackEnd.Models.DAL
         {
             string commandText = "INSERT INTO ";
 
-            if (o is AppUser)
+            if (o is Bidder)
+            {
+                Bidder b = (Bidder)o;
+                commandText += "ParkPal_Auction_Bids values(@bidder_id, @parking_lot_id, @bid_time, @bid_limit, @for_start_time, @for_end_time)";
+
+                cmd.CommandText = commandText;
+
+                cmd.Parameters.Add("@bidder_id", SqlDbType.Int);
+                cmd.Parameters["@bidder_id"].Value = b.Id;
+
+                cmd.Parameters.Add("@parking_lot_id", SqlDbType.Int);
+                cmd.Parameters["@parking_lot_id"].Value = b.BiddedLot.Id;
+
+                cmd.Parameters.Add("@bid_time", SqlDbType.SmallDateTime);
+                cmd.Parameters["@bid_time"].Value = b.BidTime;
+
+                cmd.Parameters.Add("@bid_limit", SqlDbType.Int);
+                cmd.Parameters["@bid_limit"].Value = b.BidLimit;
+
+                cmd.Parameters.Add("@for_start_time", SqlDbType.SmallDateTime);
+                cmd.Parameters["@for_start_time"].Value = b.ForStartTime;
+
+                cmd.Parameters.Add("@for_end_time", SqlDbType.SmallDateTime);
+                cmd.Parameters["@for_end_time"].Value = b.ForEndTime;
+            }
+
+            else if (o is AppUser)
             {
                 AppUser u = (AppUser)o;
                 commandText += "ParkPal_Users values(@username, @email, @password, @first_name, @last_name) ";
@@ -80,13 +107,13 @@ namespace ParkPal_BackEnd.Models.DAL
                 cmd.Parameters.Add("@num_of_spaces", SqlDbType.Int);
                 cmd.Parameters["@num_of_spaces"].Value = pl.NumOfSpaces;
 
-                cmd.Parameters.AddWithValue("@geo_location", SqlGeography.Point(pl.Latitude, pl.Longitude, ParkingLot.SRID));         
+                cmd.Parameters.AddWithValue("@geo_location", SqlGeography.Point(pl.Latitude, pl.Longitude, ParkingLot.SRID));
             }
 
             else if (o is ParkingArrangement)
             {
                 ParkingArrangement pa = (ParkingArrangement)o;
-                commandText +=  "ParkPal_Parking_Arrangements values(@user_id, @parking_lot_id, @parking_spot_number, @start_time, @end_time) " +
+                commandText += "ParkPal_Parking_Arrangements values(@user_id, @parking_lot_id, @parking_spot_number, @start_time, @end_time) " +
                                 "OUTPUT Inserted.Id";
                 cmd.CommandText = commandText;
 
@@ -99,10 +126,10 @@ namespace ParkPal_BackEnd.Models.DAL
                 cmd.Parameters.Add("@parking_spot_number", SqlDbType.Int);
                 cmd.Parameters["@parking_spot_number"].Value = pa.ParentSpot.Number;
 
-                cmd.Parameters.Add("@start_time", SqlDbType.Date);
+                cmd.Parameters.Add("@start_time", SqlDbType.SmallDateTime);
                 cmd.Parameters["@start_time"].Value = pa.StartTime;
 
-                cmd.Parameters.Add("@end_time", SqlDbType.Date);
+                cmd.Parameters.Add("@end_time", SqlDbType.SmallDateTime);
                 cmd.Parameters["@end_time"].Value = pa.EndTime;
             }
 
@@ -120,10 +147,6 @@ namespace ParkPal_BackEnd.Models.DAL
                 cmd.Parameters["@starting_price"].Value = a.StartingPrice;
             }
 
-            //else if (o is Bid)
-            //{
-
-            //}
         }
 
         //--------------------------------------------------------------------------------------------------
@@ -146,6 +169,29 @@ namespace ParkPal_BackEnd.Models.DAL
                 cmd.Parameters.AddWithValue("@new_fname", u.FirstName);
                 cmd.Parameters.AddWithValue("@new_lname", u.LastName);
             }
+
+            if (o is Bidder)
+            {
+                Bidder b = (Bidder)o;
+                commandText += "ParkPal_Auction_Bids set bid_limit = @bid_limit" +
+                    "where bidder_id = @bidder_id";
+
+                cmd.CommandText = commandText;
+
+                cmd.Parameters.Add("@bidder_id", SqlDbType.Int);
+                cmd.Parameters["@bidder_id"].Value = b.Id;
+
+                cmd.Parameters.Add("@parking_lot_id", SqlDbType.Int);
+                cmd.Parameters["@parking_lot_id"].Value = b.BiddedLot.Id;
+
+                cmd.Parameters.Add("@bid_time", SqlDbType.SmallDateTime);
+                cmd.Parameters["@bid_time"].Value = b.BidLimit;
+
+                cmd.Parameters.Add("@bid_limit", SqlDbType.Int);
+                cmd.Parameters["@bid_limit"].Value = b.BidLimit;
+            }
+
+            // Update an arrangement to be an auction.
         }
 
         //--------------------------------------------------------------------------------------------------
@@ -179,7 +225,7 @@ namespace ParkPal_BackEnd.Models.DAL
 
             try // execute the command.
             {
-                if(rtype is queryType.INSERTwReturn) // Parking arragnement id sometimes is needed for auction registration.
+                if (rtype is queryType.INSERTwReturn) // Parking arragnement id sometimes is needed for auction registration.
                     return (int)cmd.ExecuteScalar();
                 else
                     return cmd.ExecuteNonQuery();
@@ -277,7 +323,7 @@ namespace ParkPal_BackEnd.Models.DAL
                     "LEFT JOIN ParkPal_Auction_Arrangements as ppaa on reses.parking_lot_id = ppaa.arrangement_id " +
                 "WHERE @origin.STDistance(geo_location) <= @distance " +
                 "GROUP BY pl.id, pl.name, pl.address, pl.hourly_tariff, pl.num_of_spaces, pl.geo_location.STAsText() "; //+
-                //"HAVING COUNT(distinct reses.id) < pl.num_of_spaces;";
+                                                                                                                        //"HAVING COUNT(distinct reses.id) < pl.num_of_spaces;";
 
             SqlConnection con = Connect("DBConnectionString");
             SqlCommand cmd = new SqlCommand(selectSTR, con);
@@ -303,12 +349,12 @@ namespace ParkPal_BackEnd.Models.DAL
                 List<ParkingLot> parkingLots = new List<ParkingLot>();
                 while (dr.Read())
                     parkingLots.Add(new ParkingLot(
-                                (int)dr["id"], 
-                                (string)dr["name"], 
-                                (string)dr["address"], 
-                                (int)dr["hourly_tariff"], 
+                                (int)dr["id"],
+                                (string)dr["name"],
+                                (string)dr["address"],
+                                (int)dr["hourly_tariff"],
                                 (int)dr["num_of_spaces"],
-                                (double)((SqlGeography)dr["geo_location"]).Lat, 
+                                (double)((SqlGeography)dr["geo_location"]).Lat,
                                 (double)((SqlGeography)dr["geo_location"]).Long,
                                 (string)dr["lot_type"]
                             )
@@ -335,7 +381,7 @@ namespace ParkPal_BackEnd.Models.DAL
         //--------------------------------------------------------------------------------------------------
         public static List<ParkingArrangement> GetParkingArrangements(int user_id, Period datePeriod)
         {
-            string selectSTR =  "SELECT *, pl.name " +
+            string selectSTR = "SELECT *, pl.name " +
                                 "FROM ParkPal_Parking_Arrangements as pa " +
                                     "join ParkPal_Parking_Lots as pl on pl.id = pa.parking_lot_id " +
                                 "WHERE pa.user_id = @user_id and GetDate()";
@@ -359,7 +405,7 @@ namespace ParkPal_BackEnd.Models.DAL
                     parkingArrangements.Add(new ParkingArrangement(
                         (int)dr["id"],
                         new ParkingSpot((int)dr["parking_spot_number"],
-                                        new ParkingLot( (int)dr["parking_lot_id"],
+                                        new ParkingLot((int)dr["parking_lot_id"],
                                                         (string)dr["name"]
                                                        )
                                         ),
@@ -393,7 +439,7 @@ namespace ParkPal_BackEnd.Models.DAL
                                 "from ParkPal_Auction_Arrangements as ppaa join " +
                                      "ParkPal_Parking_Arrangements as pppa on " +
                                      "pppa.id = ppaa.arrangement_id " +
-                                "where parking_lot_id = @parking_lot_id and" +
+                                "where parking_lot_id = @parking_lot_id and " +
                                       "start_time = @starting_time and " +
                                       "end_time = @ending_time;";
 
@@ -418,19 +464,29 @@ namespace ParkPal_BackEnd.Models.DAL
                 while (dr.Read())
                 {
                     Auction auction = new Auction();
-                    if((int?)dr["leader_id"] != null)
+
+                    if ( !dr.IsDBNull( dr.GetOrdinal("leader_id") ) )
                     {
                         auction.HighestBidder = new Bidder();
                         auction.HighestBidder.Id = (int)dr["leader_id"];
                     }
+
+                    if (dr.IsDBNull(dr.GetOrdinal("current_bid")))
+                        auction.CurrBid = 0;
+                    else
+                        auction.CurrBid = (int)dr["current_bid"];
+
                     auction.SoldArrangement = new ParkingArrangement();
-                    auction.SoldArrangement.Buyer = new AppUser();
+
+                    auction.SoldArrangement.Buyer = new Bidder();
                     auction.SoldArrangement.Buyer.Id = (int)dr["user_id"];
+
                     auction.SoldArrangement.ParentSpot = new ParkingSpot();
                     auction.SoldArrangement.ParentSpot.Number = (int)dr["parking_spot_number"];
+
                     // auction.SoldArrangement.ParentSpot.ParentLot = new ParkingLot(); 
                     auction.StartingPrice = (int)dr["starting_price"];
-                    auction.CurrBid = (int?)dr["current_bid"];
+                    
                     auctions.Add(auction);
                 }
                 return auctions;
@@ -452,11 +508,63 @@ namespace ParkPal_BackEnd.Models.DAL
         }
 
         //--------------------------------------------------------------------------------------------------
+        // Get list of bidders for a parking lot corresponding to a given time frame.
+        //--------------------------------------------------------------------------------------------------
+        public static List<Bidder> GetBidders(int parkingLotId, DateTime startTime, DateTime endTime)
+        {
+            string selectSTR =  "select * " +
+                                "from ParkPal_Auction_Bids " +
+                                "where parking_lot_id = @parking_lot_id and " +
+                                "for_start_time = @for_start_time and " +
+                                "for_end_time = @for_end_time;";
+
+            SqlConnection con = Connect("DBConnectionString");
+            SqlCommand cmd = new SqlCommand(selectSTR, con);
+
+            cmd.Parameters.Add("@parking_lot_id", SqlDbType.Int);
+            cmd.Parameters["@parking_lot_id"].Value = parkingLotId;
+
+            cmd.Parameters.Add("@for_start_time", SqlDbType.SmallDateTime);
+            cmd.Parameters["@for_start_time"].Value = startTime;
+
+            cmd.Parameters.Add("@for_end_time", SqlDbType.SmallDateTime);
+            cmd.Parameters["@for_end_time"].Value = endTime;
+
+            try
+            {
+                SqlDataReader dr = cmd.ExecuteReader(CommandBehavior.CloseConnection);
+                if (dr.HasRows == false)
+                    return null;
+
+                List<Bidder> bidders = new List<Bidder>();
+                while (dr.Read())
+                {
+                    Bidder bidder = new Bidder((int)dr["bidder_id"], (int)dr["bid_limit"], (DateTime)dr["bid_time"]);
+                    bidders.Add(bidder);
+                }
+
+                return bidders;
+            }
+            catch (Exception ex)
+            {
+                // write to log
+                throw (ex);
+            }
+            finally
+            {
+                if (con != null)
+                {
+                    con.Close();
+                }
+
+            }
+        }
+        //--------------------------------------------------------------------------------------------------
         // Unused - Get list of parking arrangements for a parking lot corresponding to requested time slot.
         //--------------------------------------------------------------------------------------------------
         public static ParkingLot GetParkingArrangements(int parkingLotId, DateTime startTime, DateTime endTime)
         {
-            string selectSTR =  "SELECT * " +
+            string selectSTR = "SELECT * " +
                                 "FROM ParkPal_Parking_Arrangements " +
                                 "WHERE parking_lot_id = parking_lot_id " +
                                 "AND @starting_time BETWEEN start_time AND end_time " +
@@ -518,7 +626,7 @@ namespace ParkPal_BackEnd.Models.DAL
         //--------------------------------------------------------------------------------------------------
         public static int GetVacantSlot(ParkingArrangement pa)
         {
-            string selectSTR =  "select distinct(parking_spot_number) " +
+            string selectSTR = "select distinct(parking_spot_number) " +
                                 "from ParkPal_Parking_Arrangements " +
                                 "where parking_lot_id = @parent_lot and " +
                                         "(@starting_time between start_time and end_time " +
@@ -580,7 +688,5 @@ namespace ParkPal_BackEnd.Models.DAL
         //--------------------------------------------------------------------------------------------------
         // Delete an object from the database. - Delete user's given parking arrangement.
         //--------------------------------------------------------------------------------------------------
-
-
     }
 }
