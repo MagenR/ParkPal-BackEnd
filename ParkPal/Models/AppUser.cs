@@ -61,9 +61,15 @@ namespace ParkPal_BackEnd.Models
         }
 
         // For Auction demo
-        public AppUser(string username)
+        public AppUser(int id, string username)
         {
+            Id = id;
             UserName = username;
+        }
+
+        public AppUser(int id)
+        {
+            Id = id;
         }
 
         public AppUser() {}

@@ -16,24 +16,23 @@ namespace ParkPal_BackEnd.Controllers
         // GET
         //--------------------------------------------------------------------------------------------------
 
-        // Gets all auction in a parking lot corresponding to a given time slot
-        //[HttpGet]
-        //[Route("auctioncampaigns")]
-        //public IHttpActionResult GetAuctionCampaign(DateTime StartTime, DateTime EndTime)
-        //{
-        //    try
-        //    {
-        //        AuctionCampaign ac = new AuctionCampaign(); // Later give lot, and space.
-        //        ac.GetAuctionCampaign(StartTime, EndTime);
-        //        if (ac == null)
-        //            return Content(HttpStatusCode.Conflict, "No parking auction campaign found.");
-        //        return Ok(ac);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return Content(HttpStatusCode.Conflict, "Error. Could not process parking campaign fetch request.\n" + ex.Message);
-        //    }
-        //}
+       // Gets all auctions in a parking lot corresponding to a given time slot
+       [HttpGet]
+       [Route("auctionsintime")]
+        public IHttpActionResult GetAuctions(int parkingLotId, DateTime StartTime, DateTime EndTime)
+        {
+            try
+            {
+                List<Auction> a = Auction.Get(parkingLotId, StartTime, EndTime);
+                if (a == null)
+                    return Content(HttpStatusCode.Conflict, "No auctions found.");
+                return Ok(a);
+            }
+            catch (Exception ex)
+            {
+                return Content(HttpStatusCode.Conflict, "Error. Could not process auctions get request.\n" + ex.Message);
+            }
+        }
 
         // GET api/values/5
         public string Get(int id)
@@ -64,63 +63,14 @@ namespace ParkPal_BackEnd.Controllers
 
         // Optional - Registers an existing arrangemnt as an auction.
 
-
-
-        // Inserts a new bidder to the auction campaign.
-        //[HttpPost]
-        //[Route("postacbidder")]
-        //public IHttpActionResult PostBidder([FromBody] Bidder b)
-        //{
-            //try
-            //{
-            //    if (DataServiceDemo.ac.Insert(b) == 0)
-            //        return Content(HttpStatusCode.Conflict, "Error. Could not insert the bidder to the campaign.");
-            //    return Ok("bidder added succesfully!");
-            //}
-            //catch (Exception ex)
-            //{
-            //    return Content(HttpStatusCode.Conflict, "Error.Adding bidder failed.\n" + ex.Message);
-            //}
-        //}
-
         //--------------------------------------------------------------------------------------------------
         // PUT
         //--------------------------------------------------------------------------------------------------
 
-        // Update a bidder's bid (if a single bidder form exists).
-        //[HttpPut]
-        //[Route("putacbidder")]
-        //public IHttpActionResult PutBidder([FromBody] Bidder b)
-        //{
-            //try
-            //{
-            //    if (DataServiceDemo.ac.Update(b) == 0)
-            //        return Content(HttpStatusCode.Conflict, "Error. Could not update the bidder's bid.");
-            //    return Ok("bidder's bid updated succesfully!");
-            //}
-            //catch (Exception ex)
-            //{
-            //    return Content(HttpStatusCode.Conflict, "Error.Updating bidder's bid failed.\n" + ex.Message);
-            //}
-        //}
-
-        //// Update a bidder list with new bid (if editing table and pressing save).
-        
-        //[HttpPut]
-        //[Route("putacbidderlist")]
-        //public IHttpActionResult PutBidderList([FromBody] List<Bidder> bc)
-        //{
-        //    try
-        //    {
-        //        if (DataServiceDemo.ac.Update(bc) == 0)
-        //            return Content(HttpStatusCode.Conflict, "Error. Could not update the bidder list.");
-        //        return Ok("bidder list updated succesfully!");
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return Content(HttpStatusCode.Conflict, "Error.Updating bidder list failed.\n" + ex.Message);
-        //    }
-        //}
+        // PUT api/values/5
+        public void Put(int id, [FromBody] string value)
+        {
+        }
 
         //--------------------------------------------------------------------------------------------------
         // DELETE
@@ -128,9 +78,9 @@ namespace ParkPal_BackEnd.Controllers
 
         // Removes auction on an existing parking arrangement.
 
-        //// DELETE api/values/5
-        //public void Delete(int id)
-        //{
-        //}
+        // DELETE api/values/5
+        public void Delete(int id)
+        {
+        }
     }
 }
