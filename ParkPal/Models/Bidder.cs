@@ -15,6 +15,7 @@ namespace ParkPal_BackEnd.Models
         DateTime bidTime, forStartTime, forEndTime;
         Auction currentLead;
         ParkingLot biddedLot;
+        List<string> auctionsRunLog;
 
         // ----------------------------------------------------------------------------------------
         // Props
@@ -27,6 +28,7 @@ namespace ParkPal_BackEnd.Models
         public DateTime BidTime { get => bidTime; set => bidTime = value; }
         public DateTime ForStartTime { get => forStartTime; set => forStartTime = value; }
         public DateTime ForEndTime { get => forEndTime; set => forEndTime = value; }
+        public List<string> AuctionsRunLog { get => auctionsRunLog; set => auctionsRunLog = value; }
 
         // ----------------------------------------------------------------------------------------
         // Constructors
@@ -41,16 +43,17 @@ namespace ParkPal_BackEnd.Models
             ForEndTime = for_end_time;
         }
 
-        public Bidder(int id, string username, int bidLimit) : base(id, username)
-        {
-            BidLimit = bidLimit;
-        }
-
-        public Bidder(int id, int bidLimit, DateTime bidTime) : base(id)
+        public Bidder(int id, string username, int bidLimit, DateTime bidTime) : base(id, username)
         {
             BidLimit = bidLimit;
             BidTime = bidTime;
         }
+
+        //public Bidder(int id, int bidLimit, DateTime bidTime) : base(id)
+        //{
+        //    BidLimit = bidLimit;
+        //    BidTime = bidTime;
+        //}
 
         public Bidder() { }
 
@@ -76,7 +79,7 @@ namespace ParkPal_BackEnd.Models
             if (base.Insert() == 1)
             {
                 AuctionCampaign ac = new AuctionCampaign(BiddedLot.Id, ForStartTime, ForEndTime);
-                ac.runAuctionCompute();
+                AuctionsRunLog = ac.RunActionsCompute();
             }             
             return 1;
         }
@@ -87,7 +90,7 @@ namespace ParkPal_BackEnd.Models
             if(base.Update() == 1)
             {
                 AuctionCampaign ac = new AuctionCampaign(BiddedLot.Id, ForStartTime, ForEndTime);
-                ac.runAuctionCompute();
+                AuctionsRunLog = ac.RunActionsCompute();
             }
             return 1;
         }
