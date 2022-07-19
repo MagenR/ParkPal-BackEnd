@@ -113,8 +113,7 @@ namespace ParkPal_BackEnd.Models.DAL
             else if (o is ParkingArrangement)
             {
                 ParkingArrangement pa = (ParkingArrangement)o;
-                commandText += "ParkPal_Parking_Arrangements values(@user_id, @parking_lot_id, @parking_spot_number, @start_time, @end_time) " +
-                                "OUTPUT Inserted.Id";
+                commandText += "ParkPal_Parking_Arrangements OUTPUT INSERTED.ID values(@user_id, @parking_lot_id, @parking_spot_number, @start_time, @end_time) ";
                 cmd.CommandText = commandText;
 
                 cmd.Parameters.Add("@user_id", SqlDbType.Int);
@@ -136,7 +135,7 @@ namespace ParkPal_BackEnd.Models.DAL
             else if (o is Auction)
             {
                 Auction a = (Auction)o;
-                commandText += "ParkPal_Auction_Arrangements values(@arrangement_id, @starting_price)";
+                commandText += "ParkPal_Auction_Arrangements (arrangement_id, starting_price) values(@arrangement_id, @starting_price, )";
 
                 cmd.CommandText = commandText;
 
@@ -250,7 +249,7 @@ namespace ParkPal_BackEnd.Models.DAL
         //--------------------------------------------------------------------------------------------------
         public static int Insert(object o)
         {
-            return ExecuteSQL(o, queryType.INSERT);
+            return (o is ParkingArrangement && !(o is Auction)) ? ExecuteSQL(o, queryType.INSERTwReturn) : ExecuteSQL(o, queryType.INSERT);
         }
 
         //--------------------------------------------------------------------------------------------------
@@ -435,13 +434,16 @@ namespace ParkPal_BackEnd.Models.DAL
         //--------------------------------------------------------------------------------------------------
         public static List<Auction> GetParkingArrangementsAuctions(int parkingLotId, DateTime startTime, DateTime endTime)
         {
-            string selectSTR = "select * " +
+            string selectSTR =  "select ppaa.arrangement_id, ppaa.starting_price, ppaa.current_bid," +
+                                    "ppaa.leader_id, pppa.parking_lot_id, pppa.parking_spot_number, pppa.start_time, pppa.end_time, " +
+                                    "ppu.id as 'seller_id', ppu.username as 'seller_username' " +
                                 "from ParkPal_Auction_Arrangements as ppaa join " +
-                                     "ParkPal_Parking_Arrangements as pppa on " +
-                                     "pppa.id = ppaa.arrangement_id " +
+                                    "ParkPal_Parking_Arrangements as pppa on " +
+                                    "pppa.id = ppaa.arrangement_id join " +
+                                    "ParkPal_Users as ppu on ppu.id = pppa.user_id " +
                                 "where parking_lot_id = @parking_lot_id and " +
-                                      "start_time = @starting_time and " +
-                                      "end_time = @ending_time;";
+                                     "start_time = @starting_time and " +
+                                     "end_time = @ending_time;";
 
             SqlConnection con = Connect("DBConnectionString");
             SqlCommand cmd = new SqlCommand(selectSTR, con);
@@ -477,14 +479,16 @@ namespace ParkPal_BackEnd.Models.DAL
                         auction.CurrBid = (int)dr["current_bid"];
 
                     auction.SoldArrangement = new ParkingArrangement();
-
+                    auction.SoldArrangement.Id = (int)dr["arrangement_id"];
                     auction.SoldArrangement.Buyer = new Bidder();
-                    auction.SoldArrangement.Buyer.Id = (int)dr["user_id"];
+                    auction.SoldArrangement.Buyer.Id = (int)dr["seller_id"];
+                    auction.SoldArrangement.Buyer.UserName = (string)dr["seller_username"];
 
                     auction.SoldArrangement.ParentSpot = new ParkingSpot();
                     auction.SoldArrangement.ParentSpot.Number = (int)dr["parking_spot_number"];
-
                     // auction.SoldArrangement.ParentSpot.ParentLot = new ParkingLot(); 
+                    // auction.SoldArrangement.ParentSpot.ParentLot = (int)dr["parking_lot_id"];
+                   
                     auction.StartingPrice = (int)dr["starting_price"];
                     
                     auctions.Add(auction);
@@ -559,6 +563,7 @@ namespace ParkPal_BackEnd.Models.DAL
 
             }
         }
+
         //--------------------------------------------------------------------------------------------------
         // Unused - Get list of parking arrangements for a parking lot corresponding to requested time slot.
         //--------------------------------------------------------------------------------------------------

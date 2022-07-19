@@ -9,7 +9,7 @@ using ParkPal_BackEnd.Models.DAL;
 
 namespace ParkPal_BackEnd.Controllers
 {
-    [RoutePrefix("api/Auctions")]
+    [RoutePrefix("api/auctions")]
     public class AuctionsController : ApiController
     {
         //--------------------------------------------------------------------------------------------------
@@ -45,6 +45,8 @@ namespace ParkPal_BackEnd.Controllers
         //--------------------------------------------------------------------------------------------------
 
         // Inserts a parking arrangement and registers it as an auction.
+        [HttpPost]
+        [Route("reserve")]
         public IHttpActionResult Post([FromBody] Auction a)
         {
             if (a == null)
