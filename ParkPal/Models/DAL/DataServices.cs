@@ -190,6 +190,25 @@ namespace ParkPal_BackEnd.Models.DAL
                 cmd.Parameters["@bid_limit"].Value = b.BidLimit;
             }
 
+            if (o is Auction)
+            {
+                Auction a = (Auction)o;
+                commandText += "ParkPal_Auction_Arrangements set leader_id = @leader_id, current_bid = @current_bid " +
+                    "where arrangement_id = @arrangement_id";
+
+                cmd.CommandText = commandText;
+
+                cmd.Parameters.Add("@leader_id", SqlDbType.Int);
+                cmd.Parameters["@leader_id"].Value = a.HighestBidder.Id;
+
+                cmd.Parameters.Add("@current_bid", SqlDbType.Int);
+                cmd.Parameters["@current_bid"].Value = a.CurrBid;
+
+                cmd.Parameters.Add("@arrangement_id", SqlDbType.Int);
+                cmd.Parameters["@arrangement_id"].Value = a.SoldArrangement.Id;
+
+            }
+
             // Update an arrangement to be an auction.
         }
 
@@ -516,8 +535,9 @@ namespace ParkPal_BackEnd.Models.DAL
         //--------------------------------------------------------------------------------------------------
         public static List<Bidder> GetBidders(int parkingLotId, DateTime startTime, DateTime endTime)
         {
-            string selectSTR =  "select * " +
-                                "from ParkPal_Auction_Bids " +
+            string selectSTR =  "select ppab.*, ppu.username " +
+                                "from ParkPal_Auction_Bids as ppab " +
+                                "join ParkPal_Users as ppu on ppab.bidder_id=ppu.id " +
                                 "where parking_lot_id = @parking_lot_id and " +
                                 "for_start_time = @for_start_time and " +
                                 "for_end_time = @for_end_time;";
@@ -543,7 +563,7 @@ namespace ParkPal_BackEnd.Models.DAL
                 List<Bidder> bidders = new List<Bidder>();
                 while (dr.Read())
                 {
-                    Bidder bidder = new Bidder((int)dr["bidder_id"], (int)dr["bid_limit"], (DateTime)dr["bid_time"]);
+                    Bidder bidder = new Bidder((int)dr["bidder_id"], (string)dr["username"], (int)dr["bid_limit"], (DateTime)dr["bid_time"]);
                     bidders.Add(bidder);
                 }
 

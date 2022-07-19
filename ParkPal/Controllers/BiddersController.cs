@@ -33,7 +33,7 @@ namespace ParkPal.Controllers
             {
                 if (b.Insert() == 0)
                     return Content(HttpStatusCode.Conflict, "Error. Could not insert the bidder to the campaign.");
-                return Ok("bidder added succesfully!");
+                return Ok(b.AuctionsRunLog);
             }
             catch (Exception ex)
             {
@@ -50,7 +50,7 @@ namespace ParkPal.Controllers
             {
                 if (b.Update() == 0)
                     return Content(HttpStatusCode.Conflict, "Error. Could not update the bidder's bid.");
-                return Ok("bidder's bid updated succesfully!");
+                return Ok(b.AuctionsRunLog);
             }
             catch (Exception ex)
             {

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using ParkPal_BackEnd.Models.DAL;
@@ -15,6 +16,7 @@ namespace ParkPal_BackEnd.Models
 
         List<Auction> auctions;
         List<Bidder> bidders;
+        List<string> bidHistory;
 
         // ----------------------------------------------------------------------------------------
         // Props
@@ -22,40 +24,52 @@ namespace ParkPal_BackEnd.Models
 
         public List<Auction> Auctions { get => auctions; set => auctions = value; }
         public List<Bidder> Bidders { get => bidders; set => bidders = value; }
+        public List<string> BidHistory { get => bidHistory; set => bidHistory = value; }
 
         // ----------------------------------------------------------------------------------------
         // Constructors
         // ----------------------------------------------------------------------------------------
 
-        public AuctionCampaign(int parkingLotId, DateTime startTime, DateTime endTime) 
+        public AuctionCampaign(int parkingLotId, DateTime startTime, DateTime endTime)
         {
+            BidHistory = new List<string>();
             Auctions = GetAuctions(parkingLotId, startTime, endTime);
             Bidders = GetBidders(parkingLotId, startTime, endTime);
         }
 
         public AuctionCampaign() { }
-        
+
         // ----------------------------------------------------------------------------------------
         // Methods
         // ----------------------------------------------------------------------------------------
 
-        public void runAuctionCompute()
+        // Update auctions in DB.
+        private void UpdateAuctionsInDB()
         {
-            if(Auctions != null && Bidders != null)
+            foreach (Auction a in Auctions)
+                a.Update();
+        }
+
+        public List<string> RunActionsCompute()
+        {
+            if (Auctions != null && Bidders != null)
             {
-                initAuctions();
-                autoBid(Auctions, Bidders);
+                InitAuctions();
+                AutoBid(Auctions, Bidders);
             }
-                
+            UpdateAuctionsInDB();
+            return BidHistory;
         }
 
         // If auctions are virgin, current bid is their starting price.
-        public void initAuctions()
-        {
-            foreach(Auction a in Auctions)
-                if (a.CurrBid == 0)
-                    a.CurrBid = a.StartingPrice;
 
+        public void InitAuctions()
+        {
+            foreach (Auction a in Auctions)
+            {
+                BidHistory.Add(a.SoldArrangement.Buyer.UserName + "'s Auction, Started with:" + a.StartingPrice + " money.");
+                a.CurrBid = a.StartingPrice;
+            }
         }
 
         // Initialize auctions for this campaign with given seller.
@@ -70,14 +84,15 @@ namespace ParkPal_BackEnd.Models
         }
 
         // Place a bid on a given auction.
-        public bool placeNewBid(Auction auction, Bidder bidder)
+
+        public bool PlaceNewBid(Auction auction, Bidder bidder)
         {
             if (bidder.BidLimit > auction.CurrBid)
             {
                 if (auction.HighestBidder != null)
                     auction.CurrBid++;
-                //string h = bidder.UserName + " bid on " + auction.Seller.UserName + "'s Auction, " + auction.CurrBid + " money.";
-                //BidHistory.Add(h);
+                string h = bidder.UserName + " bid on " + auction.SoldArrangement.Buyer.UserName + "'s Auction, " + auction.CurrBid + " money.";
+                BidHistory.Add(h);
                 auction.HighestBidder = bidder;
                 bidder.CurrentLead = auction;
                 bidder.CurrentBid = auction.CurrBid;
@@ -101,7 +116,8 @@ namespace ParkPal_BackEnd.Models
         }
 
         // Checks if user was outbid in campaign.
-        public bool outbid(Bidder bidder, List<Auction> auctions)
+
+        public bool OutBid(Bidder bidder, List<Auction> auctions)
         {
             foreach (Auction auction in auctions)
                 if (auction.HighestBidder == bidder)
@@ -110,7 +126,8 @@ namespace ParkPal_BackEnd.Models
         }
 
         // Run over bidders list and assign them for an auction if possible.
-        public void autoBid(List<Auction> auctions, List<Bidder> bidders)
+
+        public void AutoBid(List<Auction> auctions, List<Bidder> bidders)
         {
             bool bidUpdated = true, bidWasPlaced = false;
             while (bidUpdated)
@@ -118,10 +135,10 @@ namespace ParkPal_BackEnd.Models
                 bidUpdated = false;
                 foreach (Bidder bidder in bidders)
                 {
-                    if (outbid(bidder, auctions))
+                    if (OutBid(bidder, auctions))
                     {
                         //bidder.CurrentLead = null;
-                        bidWasPlaced = placeNewBid(findLowestAuction(auctions), bidder);
+                        bidWasPlaced = PlaceNewBid(findLowestAuction(auctions), bidder);
                         if (bidUpdated == false && bidWasPlaced == true)
                             bidUpdated = true;
                     }
