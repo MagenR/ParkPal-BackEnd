@@ -135,7 +135,7 @@ namespace ParkPal_BackEnd.Models.DAL
             else if (o is Auction)
             {
                 Auction a = (Auction)o;
-                commandText += "ParkPal_Auction_Arrangements (arrangement_id, starting_price) values(@arrangement_id, @starting_price, )";
+                commandText += "ParkPal_Auction_Arrangements (arrangement_id, starting_price) values(@arrangement_id, @starting_price)";
 
                 cmd.CommandText = commandText;
 
