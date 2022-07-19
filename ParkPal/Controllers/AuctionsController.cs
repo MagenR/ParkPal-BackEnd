@@ -55,7 +55,7 @@ namespace ParkPal_BackEnd.Controllers
             {
                 if (a.Insert() == 0)
                     return Content(HttpStatusCode.Conflict, "Error. Could not reserve parking and auction.");
-                return Ok();
+                return Ok(a.SoldArrangement.ParentSpot.Number);
             }
             catch (Exception ex)
             {
